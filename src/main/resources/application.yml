@@ -1,0 +1,22 @@
+server:
+  port: 5000
+
+spring:
+  datasource:
+    url: #
+    username: #
+    password: #
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+stock:
+  proxy:
+    ip: 127.0.0.1:8080
+    use-proxy: false
+    exclude-url: 123
+
+tushare:
+  url: http://api.tushare.pro
+  token: #
+
+mybatis:
+  mapper-locations: 'classpath:/mapper/**/*.xml'

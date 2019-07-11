@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id = "poolingHttpClientConnectionManager" class="com.yuanpin.common.http.spring.PoolingHttpClientConnectionManagerFactory">
+        <!--<property name="maxTotal" value="200" />-->
+    </bean>
+
+    <bean id="proxyRule" class="com.yuanpin.base.common.net.ProxyRule">
+        <property name="proxy" value="${stock.proxy.ip}"/>
+        <property name="useProxy" value="${stock.proxy.use-proxy}"/>
+        <property name="proxyUrlRegsExclude">
+            <list>
+                <value>${stock.proxy.exclude-url}</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="httpClientLogger" class="com.yuanpin.common.http.logger.BaseLoggerImpl" />
+
+    <bean id="httpClientRmi" class="com.yuanpin.common.http.client.HttpClient" destroy-method="close">
+        <property name="pccm" ref="poolingHttpClientConnectionManager"/>
+        <property name="proxyRule" ref="proxyRule"/>
+    </bean>
+
+    <bean  class="com.yuanpin.common.http.spring.MethodScannerConfigurer">
+        <property name="basePackage" value="org.dcais.stock.stock.entity com.yuanpin.common.http"/>
+        <!--<property name="basePackage" value="com.yuanpin.http.rmi com.yuanpin.clora.http.request com.yuanpin.clora.common.http com.yuanpin.pe.http"/>-->
+        <property name="annotationClass" value="com.yuanpin.common.http.annotation.HttpRequest"/>
+        <property name="httpClientBeanName" value="httpClientRmi" />
+    </bean>
+
+</beans>

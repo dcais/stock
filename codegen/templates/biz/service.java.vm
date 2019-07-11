@@ -8,9 +8,9 @@ import ${entity_java_vm_pkgPrefix}.${FMT.XyzAbc($table)};
 public interface ${FMT.XyzAbc($table)}Service {
   List<${FMT.XyzAbc($table)}> getAll();
 
-  List<${FMT.XyzAbc(${table})}> select(${FMT.XyzAbc(${table})}QueryParam param);
+  List<${FMT.XyzAbc(${table})}> select(Map<String,Object> param);
 
-  Integer selectCount(${FMT.XyzAbc(${table})}QueryParam param);
+  Integer selectCount(Map<String,Object> param);
 
   ${FMT.XyzAbc($table)} getById(Long id);
 

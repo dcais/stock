@@ -18,3 +18,4 @@ rebel.xml
 .factorypath
 bootstrap.yml
 codegen/out
+src/main/resources/application-*.yml

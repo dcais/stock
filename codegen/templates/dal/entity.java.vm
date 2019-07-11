@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import com.yuanpin.shared.entity.base.BaseEntity;
+import org.dcais.stock.stock.entity.BaseEntity;
 
 @EqualsAndHashCode(callSuper = false)
 @Data

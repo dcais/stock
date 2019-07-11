@@ -49,6 +49,14 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.yuanpin.base</groupId>
+			<artifactId>yuanpin-base-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.yuanpin.base</groupId>
+			<artifactId>sq-http</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -59,6 +67,26 @@
 				<version>${spring-cloud.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.yuanpin.base</groupId>
+				<artifactId>yuanpin-base-common</artifactId>
+				<version>2.0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yuanpin.base</groupId>
+				<artifactId>sq-http</artifactId>
+				<version>1.5.2</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-aop</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

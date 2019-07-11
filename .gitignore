@@ -17,3 +17,4 @@ rebel.xml
 .vscode
 .factorypath
 bootstrap.yml
+codegen/out

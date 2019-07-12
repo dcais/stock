@@ -1,5 +1,7 @@
 server:
-  port: 5000
+  port: 5001
+  servlet:
+    context-path: /stock
 
 spring:
   datasource:
@@ -7,6 +9,9 @@ spring:
     username: #
     password: #
     driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+    time-zone: GMT+8
 
 stock:
   proxy:
@@ -20,3 +25,5 @@ tushare:
 
 mybatis:
   mapper-locations: 'classpath:/mapper/**/*.xml'
+
+

@@ -26,7 +26,7 @@
     </bean>
 
     <bean  class="com.yuanpin.common.http.spring.MethodScannerConfigurer">
-        <property name="basePackage" value="org.dcais.stock.stock.entity com.yuanpin.common.http"/>
+        <property name="basePackage" value="org.dcais.stock.stock.http com.yuanpin.common.http"/>
         <!--<property name="basePackage" value="com.yuanpin.http.rmi com.yuanpin.clora.http.request com.yuanpin.clora.common.http com.yuanpin.pe.http"/>-->
         <property name="annotationClass" value="com.yuanpin.common.http.annotation.HttpRequest"/>
         <property name="httpClientBeanName" value="httpClientRmi" />

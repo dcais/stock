@@ -5,6 +5,7 @@ import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dcais.stock.stock.annotation.TuShareField;
 import org.dcais.stock.stock.entity.BaseEntity;
 
 
@@ -12,6 +13,7 @@ import org.dcais.stock.stock.entity.BaseEntity;
 @Data
 public class Basic extends BaseEntity {
 
+  @TuShareField("ts_code")
   private String tsCode;
   private String symbol;
   private String name;

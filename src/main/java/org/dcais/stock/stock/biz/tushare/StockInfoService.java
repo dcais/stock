@@ -2,10 +2,12 @@ package org.dcais.stock.stock.biz.tushare;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.dcais.stock.stock.biz.tushare.parser.TushareDataParser;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.JsonUtil;
+import org.dcais.stock.stock.common.utils.StringUtil;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.http.tushare.TushareRequestApi;
 import org.dcais.stock.stock.http.tushare.param.TushareParam;
@@ -14,7 +16,9 @@ import org.dcais.stock.stock.http.tushare.result.TushareResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class StockInfoService {
@@ -24,9 +28,16 @@ public class StockInfoService {
     @Autowired
     private TushareParamGem tushareParamGem;
 
-    public Result stockBasicInfo(){
+    public Result stockBasicInfo(String listStatus){
         TushareParam tushareParam = tushareParamGem.getParam("stock_basic");
         tushareParam.setFields(TushareRequestFields.basic);
+
+        if(StringUtils.isNotBlank(listStatus)){
+            Map<String,Object> param = new HashMap<>();
+            param.put("list_status", listStatus);
+            tushareParam.setParams(param);
+        }
+
         Result<TushareData> tushareResult = this.request(tushareParam);
         if(!tushareResult.isSuccess()){
             return tushareResult;
@@ -41,7 +52,7 @@ public class StockInfoService {
         basic = StringEscapeUtils.unescapeJava(basic);
         Gson gson = JsonUtil.getGsonObj();
         TushareResult tushareResult = gson.fromJson(basic,new TypeToken<TushareResult>(){}.getType());
-        if(tushareResult.getCode() != null ){
+        if(tushareResult.getCode() != 0 ){
             return Result.wrapErrorResult("",tushareResult.getMsg());
         }
         return Result.wrapSuccessfulResult(tushareResult.getData());

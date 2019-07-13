@@ -40,13 +40,13 @@
         <if test = "isDeleted != null and isDeleted != ''">
             is_deleted=#{isDeleted},
         </if>
-        <if test = "gmtCreate != null and gmtCreate != ''">
+        <if test = "gmtCreate != null">
             gmt_create=#{gmtCreate},
         </if>
         <if test = "creator != null and creator != ''">
             creator=#{creator},
         </if>
-        <if test = "gmtModified != null and gmtModified != ''">
+        <if test = "gmtModified != null">
             gmt_modified=#{gmtModified},
         </if>
         <if test = "modifier != null and modifier != ''">

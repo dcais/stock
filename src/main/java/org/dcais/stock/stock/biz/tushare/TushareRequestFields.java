@@ -17,4 +17,25 @@ public class TushareRequestFields {
         "delist_date",
         "is_hs"
     };
+
+    public static String[] tradeCal = {
+      "exchange",
+      "cal_date",
+      "is_open",
+      "pretrade_date"
+    };
+
+    public static String[] daily = {
+        "ts_code"
+        ,"trade_date"
+        ,"open"
+        ,"high"
+        ,"low"
+        ,"close"
+        ,"pre_close"
+        ,"change"
+        ,"pct_chg"
+        ,"vol"
+        ,"amount"
+    };
 }

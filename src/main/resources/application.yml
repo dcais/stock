@@ -26,4 +26,15 @@ tushare:
 mybatis:
   mapper-locations: 'classpath:/mapper/**/*.xml'
 
+#logging:
+#  level:
+#    root: DEBUG
+#    org.dcais.stock: DEBUG
+#    org:
+#      springframework:
+#        web: DEBUG
+#    com.ibatis: WARN
+#    java.sql: DEBUG
+#    java.sql.ResultSet: DEBUG
+
 

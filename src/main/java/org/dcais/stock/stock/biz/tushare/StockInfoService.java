@@ -6,21 +6,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.dcais.stock.stock.biz.tushare.parser.TushareDataParser;
 import org.dcais.stock.stock.common.result.Result;
+import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.JsonUtil;
 import org.dcais.stock.stock.common.utils.StringUtil;
 import org.dcais.stock.stock.entity.basic.Basic;
+import org.dcais.stock.stock.entity.info.Daily;
+import org.dcais.stock.stock.entity.basic.TradeCal;
 import org.dcais.stock.stock.http.tushare.TushareRequestApi;
 import org.dcais.stock.stock.http.tushare.param.TushareParam;
 import org.dcais.stock.stock.http.tushare.result.TushareData;
 import org.dcais.stock.stock.http.tushare.result.TushareResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@Service
 public class StockInfoService {
     @Autowired
     private TushareRequestApi tushareRequestApi;
@@ -47,7 +51,56 @@ public class StockInfoService {
         return Result.wrapSuccessfulResult(basicList);
     }
 
-    public Result<TushareData> request(TushareParam tushareParam){
+    public Result tradeCal(String exchange, Date startDate, Date endDate){
+        TushareParam tushareParam = tushareParamGem.getParam("trade_cal");
+        tushareParam.setFields(TushareRequestFields.tradeCal);
+        Map<String,Object> param = new HashMap<>();
+        if(StringUtil.isNotBlank(exchange)){
+            param.put("exchange", exchange);
+        }
+        if(startDate != null ){
+            param.put("start_date", DateUtils.formatDate(startDate,DateUtils.YMD));
+        }
+        if(endDate!= null ){
+            param.put("end_date", DateUtils.formatDate(endDate,DateUtils.YMD));
+        }
+        tushareParam.setParams(param);
+        Result<TushareData> tushareResult = this.request(tushareParam);
+        if(!tushareResult.isSuccess()){
+            return tushareResult;
+        }
+        List<TradeCal> tradeCals = TushareDataParser.parse(tushareResult.getData(), TradeCal.class);
+        return Result.wrapSuccessfulResult(tradeCals);
+    }
+
+    public  Result daily(String tsCode , Date tradeDate , Date startDate, Date endDate){
+        TushareParam tushareParam = tushareParamGem.getParam("daily");
+        tushareParam.setFields(TushareRequestFields.daily);
+        Map<String,Object> param = new HashMap<>();
+
+        if(StringUtil.isNotBlank(tsCode)){
+            param.put("ts_code",tsCode);
+        }
+        if(tradeDate != null){
+            param.put("trade_date",DateUtils.formatDate(tradeDate,DateUtils.YMD));
+        }
+        if(startDate != null ){
+            param.put("start_date", DateUtils.formatDate(startDate,DateUtils.YMD));
+        }
+        if(endDate != null ){
+            param.put("end_date", DateUtils.formatDate(endDate,DateUtils.YMD));
+        }
+        tushareParam.setParams(param);
+        Result<TushareData> tushareResult = this.request(tushareParam);
+        if(!tushareResult.isSuccess()){
+            return tushareResult;
+        }
+
+        List<Daily> daily = TushareDataParser.parse(tushareResult.getData(), Daily.class);
+        return Result.wrapSuccessfulResult(daily);
+    }
+
+    private Result<TushareData> request(TushareParam tushareParam){
         String basic = tushareRequestApi.request(tushareParam);
         basic = StringEscapeUtils.unescapeJava(basic);
         Gson gson = JsonUtil.getGsonObj();

@@ -9,6 +9,6 @@ import org.dcais.stock.stock.http.tushare.param.TushareParam;
 @HttpRequest(url = "${tushare.url}")
 public interface TushareRequestApi {
 
-    @HttpAttr(method = HttpMehod.POST)
+    @HttpAttr(url="/",method = HttpMehod.POST)
     String request(@ReqBody TushareParam tushareParam);
 }

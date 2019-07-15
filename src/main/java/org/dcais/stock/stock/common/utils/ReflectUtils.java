@@ -1,6 +1,5 @@
 package org.dcais.stock.stock.common.utils;
 
-import com.sun.tools.javac.util.StringUtils;
 
 import java.lang.reflect.*;
 import java.text.SimpleDateFormat;
@@ -24,7 +23,7 @@ public class ReflectUtils {
         }
         for (Method method : bean.getClass().getMethods()) {
             if (method.getName().startsWith(GET_PRE)) {
-                String fieldNameStart = StringUtils.toLowerCase(StringUtil.substring(
+                String fieldNameStart = StringUtil.toLowerCase(StringUtil.substring(
                         method.getName(), 3, 4));
                 if (StringUtil.isBlank(fieldNameStart)) {
                     continue;

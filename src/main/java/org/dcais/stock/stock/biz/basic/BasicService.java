@@ -22,4 +22,6 @@ public interface BasicService {
   int deleteByIds(Long[] ids);
 
   Result sync();
+
+  Basic getBySymbol(String symbol);
 }

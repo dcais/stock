@@ -13,10 +13,13 @@ import org.dcais.stock.stock.biz.basic.BasicService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.JsonUtil;
+import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.dao.basic.BasicDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.swing.plaf.ListUI;
 
 
 @Slf4j
@@ -88,4 +91,15 @@ public class BasicServiceImpl extends BaseServiceImpl implements BasicService {
     return Result.wrapSuccessfulResult("OK");
   }
 
+  @Override
+  public Basic getBySymbol(String symbol) {
+    Map<String, Object> param = new HashMap<>();
+    param.put("isDeleted", "N");
+    param.put("symbol", symbol);
+    List<Basic> tmps = this.select(param);
+    if(ListUtil.isBlank(tmps)){
+      return null;
+    }
+    return tmps.get(0);
+  }
 }

@@ -13,6 +13,7 @@ import org.dcais.stock.stock.dao.info.DailyDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.Daily;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,6 +29,8 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
   private BasicService basicService;
   @Autowired
   private StockInfoService stockInfoService;
+  @Value("${stock.batch-insert-size:1000}")
+  private Integer batchInsertSize;
 
   public List<Daily> getAll() {
     return super.getAll(dailyDao);
@@ -92,7 +95,7 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
 
           Calendar calendar = Calendar.getInstance();
           calendar.setTime(startDate);
-          calendar.add(calendar.YEAR, 1);
+          calendar.add(calendar.YEAR, 2);
           Date endDate = calendar.getTime();
           Result result = stockInfoService.daily(basic.getTsCode(),null,startDate,endDate);
 
@@ -101,11 +104,23 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
              break;
           }
           List<Daily> dailyList = (List<Daily>) result.getData();
-          for(int i=dailyList.size()-1 ; i>=0 ; i --){
-              Daily daily = dailyList.get(i);
-              this.dealWithSync(daily);
+          List<List<Daily>> subList = ListUtil.getSubDepartList(dailyList,batchInsertSize);
+          for(int i= subList.size()-1 ; i>=0 ; i-- ){
+              List<Daily> dailies = subList.get(i);
+              if(ListUtil.isBlank(dailies)){
+                  continue;
+              }
+
+              List<Daily> tmps = new ArrayList<>(dailies.size());
+              for(int j=dailies.size()-1 ; j>=0 ; j --){
+                Daily daily = dailies.get(j);
+                daily.setDefaultBizValue();
+                tmps.add(daily);
+              }
+
+              dailyDao.batchInsert(tmps);
           }
-          startDate = endDate;
+         startDate = endDate;
       }
 
       return Result.wrapSuccessfulResult("OK");

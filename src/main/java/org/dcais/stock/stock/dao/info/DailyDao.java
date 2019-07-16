@@ -2,6 +2,7 @@ package org.dcais.stock.stock.dao.info;
 
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.dcais.stock.stock.dao.BaseDao;
 import org.dcais.stock.stock.entity.info.Daily;
 
@@ -16,4 +17,6 @@ public interface DailyDao extends BaseDao<Daily> {
     Integer selectCount(Map<String, Object> params);
 
     List<Daily> getMaxDaily(String tsCode);
+
+    Integer batchInsert(@Param("list")List<Daily> dailies);
 }

@@ -173,6 +173,46 @@
         )
     </insert>
 
+    <insert id="batchInsert" parameterType="java.util.List" >
+        insert into stock_daily (
+        is_deleted,
+        gmt_create,
+        creator,
+        gmt_modified,
+        modifier,
+        ts_code,
+        trade_date,
+        open,
+        high,
+        low,
+        close,
+        pre_close,
+        pct_chg,
+        vol,
+        amount
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (
+            #{item.isDeleted},
+            #{item.gmtCreate},
+            #{item.creator},
+            #{item.gmtModified},
+            #{item.modifier},
+            #{item.tsCode},
+            #{item.tradeDate},
+            #{item.open},
+            #{item.high},
+            #{item.low},
+            #{item.close},
+            #{item.preClose},
+            #{item.pctChg},
+            #{item.vol},
+            #{item.amount}
+            )
+        </foreach>
+    </insert>
+
     <!-- 通过ID更新 -->
     <update id = "updateById">
         update stock_daily

@@ -39,8 +39,9 @@ public class StockController {
 
     @RequestMapping(value="/syncAll",method = RequestMethod.GET)
     @ResponseBody
-    public Result syncAll(@RequestParam(required = true) String symbol){
-        return dailyService.syncHistory(symbol);
+    public Result syncAll(){
+        dailyService.syncAll();
+        return Result.wrapSuccessfulResult("OK");
     }
 
     @RequestMapping(value="/logLevelTest",method = RequestMethod.GET)

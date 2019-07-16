@@ -98,13 +98,16 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
           calendar.add(calendar.YEAR, 2);
           Date endDate = calendar.getTime();
           Result result = stockInfoService.daily(basic.getTsCode(),null,startDate,endDate);
-
           if(!result.isSuccess()){
              log.error(result.getErrorMsg());
              break;
           }
+          startDate = endDate;
           List<Daily> dailyList = (List<Daily>) result.getData();
           List<List<Daily>> subList = ListUtil.getSubDepartList(dailyList,batchInsertSize);
+          if(ListUtil.isBlank(subList)){
+            continue;
+          }
           for(int i= subList.size()-1 ; i>=0 ; i-- ){
               List<Daily> dailies = subList.get(i);
               if(ListUtil.isBlank(dailies)){
@@ -120,7 +123,6 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
 
               dailyDao.batchInsert(tmps);
           }
-         startDate = endDate;
       }
 
       return Result.wrapSuccessfulResult("OK");

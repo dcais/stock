@@ -13,7 +13,6 @@ import org.dcais.stock.stock.dao.info.DailyDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.Daily;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -59,6 +58,13 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
   }
 
   @Override
+  public void syncAll(){
+      List<Basic> basics = basicService.getAllList();
+      basics.forEach(this::syncHistory);
+  }
+
+
+  @Override
   public Result syncHistory(String symbol) {
       Basic basic = basicService.getBySymbol(symbol);
       if(basic == null){
@@ -66,7 +72,10 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
           log.error(errMsg);
           return Result.wrapErrorResult("",errMsg);
       }
+      return syncHistory(basic);
+  }
 
+  private Result syncHistory(Basic basic){
       Daily dailyMaxInDb = null;
       Date startDate = null;
       List<Daily> lastestDailys = dailyDao.getMaxDaily(basic.getTsCode());

@@ -37,12 +37,17 @@ public class StockController {
         return dailyService.syncHistory(symbol);
     }
 
+    @RequestMapping(value="/syncAll",method = RequestMethod.GET)
+    @ResponseBody
+    public Result syncAll(@RequestParam(required = true) String symbol){
+        return dailyService.syncHistory(symbol);
+    }
+
     @RequestMapping(value="/logLevelTest",method = RequestMethod.GET)
     @ResponseBody
     public Result logLevelTest() {
         log.info("info");
         log.debug("debug");
-//        return tradeCalService.sync();
         return Result.wrapSuccessfulResult("");
     }
 

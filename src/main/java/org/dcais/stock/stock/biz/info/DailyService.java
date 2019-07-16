@@ -22,6 +22,8 @@ public interface DailyService {
 
   int deleteByIds(Long[] ids);
 
+  void syncAll();
+
   Result syncHistory(String symbol);
 }
 

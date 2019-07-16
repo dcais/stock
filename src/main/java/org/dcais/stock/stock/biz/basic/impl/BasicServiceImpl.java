@@ -102,4 +102,13 @@ public class BasicServiceImpl extends BaseServiceImpl implements BasicService {
     }
     return tmps.get(0);
   }
+
+  @Override
+  public List<Basic> getAllList(){
+    Map<String, Object> param = new HashMap<>();
+    param.put("isDeleted", "N");
+    param.put("listStatus", "L");
+    List<Basic> tmps = this.select(param);
+    return tmps;
+  }
 }

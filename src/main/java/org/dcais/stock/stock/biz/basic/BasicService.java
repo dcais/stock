@@ -24,4 +24,6 @@ public interface BasicService {
   Result sync();
 
   Basic getBySymbol(String symbol);
+
+  List<Basic> getAllList();
 }

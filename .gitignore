@@ -19,3 +19,4 @@ rebel.xml
 bootstrap.yml
 codegen/out
 src/main/resources/application-*.yml
+deploy/docker/jar

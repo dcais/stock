@@ -1,5 +1,6 @@
 package org.dcais.stock.stock.biz.tushare;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +20,7 @@ import org.dcais.stock.stock.http.tushare.result.TushareResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,13 @@ public class StockInfoService {
 
     @Autowired
     private TushareParamGem tushareParamGem;
+
+    private RateLimiter rateLimiter;
+
+    @PostConstruct
+    private void init(){
+        rateLimiter = RateLimiter.create(3);
+    }
 
     public Result stockBasicInfo(String listStatus){
         TushareParam tushareParam = tushareParamGem.getParam("stock_basic");
@@ -101,6 +110,7 @@ public class StockInfoService {
     }
 
     private Result<TushareData> request(TushareParam tushareParam){
+        rateLimiter.acquire();
         String basic = tushareRequestApi.request(tushareParam);
         basic = StringEscapeUtils.unescapeJava(basic);
         Gson gson = JsonUtil.getGsonObj();

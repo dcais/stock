@@ -84,7 +84,10 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
       List<Daily> lastestDailys = dailyDao.getMaxDaily(basic.getTsCode());
       if(ListUtil.isNotBlank(lastestDailys)){
           dailyMaxInDb = lastestDailys.get(0);
-          startDate = dailyMaxInDb.getTradeDate();
+          Calendar c = Calendar.getInstance();
+          c.setTime(dailyMaxInDb.getTradeDate());
+          c.add(Calendar.DATE,1);
+          startDate =  c.getTime();
       }
       if(startDate == null){
           startDate = basic.getListDate();

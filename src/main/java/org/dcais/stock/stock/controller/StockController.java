@@ -16,8 +16,7 @@ public class StockController {
     private BasicService basicService;
     @Autowired
     private TradeCalService tradeCalService;
-    @Autowired
-    private DailyService dailyService;
+
 
     @RequestMapping(value="/syncBasic",method = RequestMethod.GET)
     @ResponseBody
@@ -31,18 +30,6 @@ public class StockController {
         return tradeCalService.sync();
     }
 
-    @RequestMapping(value="/syncDailyBySymbol",method = RequestMethod.GET)
-    @ResponseBody
-    public Result syncDailyBySymbol(@RequestParam(required = true) String symbol){
-        return dailyService.syncHistory(symbol);
-    }
-
-    @RequestMapping(value="/syncAll",method = RequestMethod.GET)
-    @ResponseBody
-    public Result syncAll(){
-        dailyService.syncAll();
-        return Result.wrapSuccessfulResult("OK");
-    }
 
     @RequestMapping(value="/logLevelTest",method = RequestMethod.GET)
     @ResponseBody

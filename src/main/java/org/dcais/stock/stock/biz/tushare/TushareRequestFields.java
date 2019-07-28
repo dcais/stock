@@ -38,4 +38,10 @@ public class TushareRequestFields {
         ,"vol"
         ,"amount"
     };
+
+    public static String[] adjFactor = {
+            "ts_code"
+            ,"trade_date"
+            ,"adj_factor"
+    };
 }

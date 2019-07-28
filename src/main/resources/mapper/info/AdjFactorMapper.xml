@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "org.dcais.stock.stock.dao.info.AdjFactorDao">
+
+    <resultMap id = "BaseResultMap" type = "org.dcais.stock.stock.entity.info.AdjFactor"
+               extends = "COMMON.BASE_RESULT_MAP">
+        <result column = "ts_code" property = "tsCode" />
+        <result column = "trade_date" property = "tradeDate" />
+        <result column = "adj_factor" property = "adjFactor" />
+    </resultMap>
+
+    <sql id = "BaseWhereClause">
+        <where>
+            <trim prefixOverrides = "and">
+                <include refid = "COMMON.BASE_WHERE_CLAUSE" />
+                <if test = "tsCode != null">
+                    and ts_code = #{tsCode}
+                </if>
+                <if test = "tradeDate != null">
+                    and trade_date = #{tradeDate}
+                </if>
+                <if test = "adjFactor != null">
+                    and adj_factor = #{adjFactor}
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id = "BaseUpdateSet">
+        <set>
+            <include refid = "COMMON.BASE_UPDATE_SET" />
+            <if test = "tsCode != null">
+                ts_code = #{tsCode},
+            </if>
+            <if test = "tradeDate != null">
+                trade_date = #{tradeDate},
+            </if>
+            <if test = "adjFactor != null">
+                adj_factor = #{adjFactor}
+            </if>
+        </set>
+    </sql>
+
+    <!-- 查询总数 -->
+    <select id = "selectCount" resultType = "java.lang.Integer">
+        select count(id)
+        from stock_adj_factor
+        <include refid = "BaseWhereClause" />
+    </select>
+
+    <!-- 查询 -->
+    <select id = "select" resultMap = "BaseResultMap">
+        select
+        <include refid = "COMMON.ALL_COLUMN_LIST" />
+        from stock_adj_factor
+        <include refid = "BaseWhereClause" />
+        <include refid = "COMMON.ORDER_BY" />
+        <include refid = "COMMON.PAGE" />
+    </select>
+
+    <!-- 根据ID查询 -->
+    <select id = "selectById" resultMap = "BaseResultMap">
+        select
+        <include refid = "COMMON.ALL_COLUMN_LIST" />
+        from stock_adj_factor
+        where id = #{id}
+        and is_deleted = 'N'
+    </select>
+
+    <!-- 根据IDS批量删除 -->
+    <update id = "deleteByIds">
+        update stock_adj_factor
+        set is_deleted='Y'
+        where id in
+        (
+        <foreach collection = "array" index = "index" item = "tag" separator = ",">
+            #{tag}
+        </foreach>
+        )
+    </update>
+
+    <!-- 根据ID删除 -->
+    <update id = "deleteById">
+        update stock_adj_factor
+        set is_deleted='Y'
+        where id=#{id}
+    </update>
+
+    <!-- 删除 -->
+    <delete id = "delete">
+        update stock_adj_factor
+        set is_deleted='Y'
+        <include refid = "BaseWhereClause" />
+    </delete>
+
+    <!-- 添加   -->
+    <insert id = "insert" useGeneratedKeys = "true" keyProperty = "id">
+        insert into stock_adj_factor (
+        <include refid = "COMMON.BASE_INSERT_COLUMN" />
+        ts_code,
+        trade_date,
+        adj_factor
+        )
+        values (
+        <include refid = "COMMON.BASE_INSERT_VALUE" />
+        #{tsCode},
+        #{tradeDate},
+        #{adjFactor}
+        )
+    </insert>
+
+    <insert id="batchInsert" parameterType="java.util.List" >
+        insert into stock_adj_factor (
+        is_deleted,
+        gmt_create,
+        creator,
+        gmt_modified,
+        modifier,
+        ts_code,
+        trade_date,
+        adj_factor
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (
+            #{item.isDeleted},
+            #{item.gmtCreate},
+            #{item.creator},
+            #{item.gmtModified},
+            #{item.modifier},
+            #{item.tsCode},
+            #{item.tradeDate},
+            #{item.adjFactor}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 通过ID更新 -->
+    <update id = "updateById">
+        update stock_adj_factor
+        <include refid = "BaseUpdateSet" />
+        where id = #{id}
+    </update>
+
+    <select id="getMaxDaily" resultMap = "BaseResultMap">
+        select * from stock_adj_factor
+        where
+            is_deleted = 'N'
+        and ts_code = #{tsCode}
+        order by trade_date desc
+        limit 1;
+    </select>
+
+</mapper>

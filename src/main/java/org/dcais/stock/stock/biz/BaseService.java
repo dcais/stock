@@ -1,7 +1,7 @@
 package org.dcais.stock.stock.biz;
 
 
-import org.dcais.stock.stock.dao.BaseDao;
+import org.dcais.stock.stock.dao.mybatis.BaseDao;
 import org.dcais.stock.stock.entity.IdEntity;
 
 import java.util.List;

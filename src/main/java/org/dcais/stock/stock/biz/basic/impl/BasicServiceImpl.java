@@ -14,12 +14,10 @@ import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.JsonUtil;
 import org.dcais.stock.stock.common.utils.ListUtil;
-import org.dcais.stock.stock.dao.basic.BasicDao;
+import org.dcais.stock.stock.dao.mybatis.basic.BasicDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.swing.plaf.ListUI;
 
 
 @Slf4j

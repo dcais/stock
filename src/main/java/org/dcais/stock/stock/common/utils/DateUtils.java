@@ -221,6 +221,8 @@ public class DateUtils {
                 date = formatStringToDate(text, Y_M_D_HM);
             } else if (text.length() == 19) {
                 date = formatStringToDate(text, Y_M_D_HMS);
+            } else if (text.length() == 28) {
+                date = formatStringToDate(text, ISO_DATE_TIME);
             } else {
                 throw new IllegalArgumentException("日期长度不符合要求!");
             }

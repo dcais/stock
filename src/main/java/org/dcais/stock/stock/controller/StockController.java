@@ -2,7 +2,6 @@ package org.dcais.stock.stock.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.basic.BasicService;
-import org.dcais.stock.stock.biz.info.DailyService;
 import org.dcais.stock.stock.biz.basic.TradeCalService;
 import org.dcais.stock.stock.common.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;

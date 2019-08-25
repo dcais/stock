@@ -9,7 +9,7 @@ import org.dcais.stock.stock.biz.BizConstans;
 import org.dcais.stock.stock.biz.basic.TradeCalService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.result.Result;
-import org.dcais.stock.stock.dao.basic.TradeCalDao;
+import org.dcais.stock.stock.dao.mybatis.basic.TradeCalDao;
 import org.dcais.stock.stock.entity.basic.TradeCal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

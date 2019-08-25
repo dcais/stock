@@ -1,8 +1,8 @@
-package org.dcais.stock.stock.dao.basic;
+package org.dcais.stock.stock.dao.mybatis.basic;
 
 
 import org.apache.ibatis.annotations.Mapper;
-import org.dcais.stock.stock.dao.BaseDao;
+import org.dcais.stock.stock.dao.mybatis.BaseDao;
 import org.dcais.stock.stock.entity.basic.TradeCal;
 
 import java.util.Date;

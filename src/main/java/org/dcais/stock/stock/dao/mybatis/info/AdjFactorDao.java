@@ -1,9 +1,9 @@
-package org.dcais.stock.stock.dao.info;
+package org.dcais.stock.stock.dao.mybatis.info;
 
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.dcais.stock.stock.dao.BaseDao;
+import org.dcais.stock.stock.dao.mybatis.BaseDao;
 import org.dcais.stock.stock.entity.info.AdjFactor;
 
 import java.util.List;

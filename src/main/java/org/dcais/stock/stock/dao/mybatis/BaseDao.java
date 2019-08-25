@@ -1,4 +1,4 @@
-package org.dcais.stock.stock.dao;
+package org.dcais.stock.stock.dao.mybatis;
 
 import java.util.List;
 import java.util.Map;

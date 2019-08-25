@@ -22,7 +22,7 @@ public interface DailyService {
 
   int deleteByIds(Long[] ids);
 
-  void syncAll();
+  void syncAll(String mode);
 
   Result syncHistory(String symbol);
 }

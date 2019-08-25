@@ -27,14 +27,14 @@ public class MysqlDocTests extends AbstractTestNGSpringContextTests {
   private Client xDevApiClient;
 
   @BeforeClass
-  public void init(){
+  public void init() {
     Session sess = xDevApiClient.getSession();
     mySession = sess;
 
     Schema stock = mySession.getSchema("stock");
-    stockDB =stock;
+    stockDB = stock;
     Collection myColl = stockDB.getCollection(collectionName);
-    if(myColl.existsInDatabase().equals(DatabaseObject.DbObjectStatus.EXISTS)){
+    if (myColl.existsInDatabase().equals(DatabaseObject.DbObjectStatus.EXISTS)) {
       stockDB.dropCollection(collectionName);
     }
     stockDB.createCollection(collectionName);
@@ -52,13 +52,14 @@ public class MysqlDocTests extends AbstractTestNGSpringContextTests {
 //    ).execute();
 
   }
-//  @Ignore
+
+  //  @Ignore
   @Test
-  public void find(){
+  public void find() {
     Collection myColl = stockDB.getCollection(collectionName);
-    Map<String,Object> params = new HashMap<>();
-    params.put("age",12);
-    DocResult docs =myColl.find( "age > :age").sort("age asc").bind(params).execute();
+    Map<String, Object> params = new HashMap<>();
+    params.put("age", 12);
+    DocResult docs = myColl.find("age > :age").sort("age asc").bind(params).execute();
 
     List<DbDoc> dbDocs = docs.fetchAll();
     log.info(dbDocs.toString());

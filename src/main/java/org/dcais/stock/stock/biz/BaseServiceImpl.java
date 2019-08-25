@@ -38,7 +38,7 @@ public abstract class BaseServiceImpl implements BaseService {
 
     return baseDao.deleteById(id) > 0;
   }
- 
+
   public <T extends IdEntity> int deleteByIds(BaseDao<T> baseDao, Object[] ids) {
     if (ids.length == 0) {
       return 0;

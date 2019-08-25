@@ -29,123 +29,124 @@ import java.util.Map;
 
 @Service
 public class StockInfoService {
-    @Autowired
-    private TushareRequestApi tushareRequestApi;
+  @Autowired
+  private TushareRequestApi tushareRequestApi;
 
-    @Autowired
-    private TushareParamGem tushareParamGem;
+  @Autowired
+  private TushareParamGem tushareParamGem;
 
-    private RateLimiter rateLimiter;
+  private RateLimiter rateLimiter;
 
-    @PostConstruct
-    private void init(){
-        rateLimiter = RateLimiter.create(3);
+  @PostConstruct
+  private void init() {
+    rateLimiter = RateLimiter.create(3);
+  }
+
+  public Result stockBasicInfo(String listStatus) {
+    TushareParam tushareParam = tushareParamGem.getParam("stock_basic");
+    tushareParam.setFields(TushareRequestFields.basic);
+
+    if (StringUtils.isNotBlank(listStatus)) {
+      Map<String, Object> param = new HashMap<>();
+      param.put("list_status", listStatus);
+      tushareParam.setParams(param);
     }
 
-    public Result stockBasicInfo(String listStatus){
-        TushareParam tushareParam = tushareParamGem.getParam("stock_basic");
-        tushareParam.setFields(TushareRequestFields.basic);
-
-        if(StringUtils.isNotBlank(listStatus)){
-            Map<String,Object> param = new HashMap<>();
-            param.put("list_status", listStatus);
-            tushareParam.setParams(param);
-        }
-
-        Result<TushareData> tushareResult = this.request(tushareParam);
-        if(!tushareResult.isSuccess()){
-            return tushareResult;
-        }
-
-        List<Basic> basicList = TushareDataParser.parse(tushareResult.getData(), Basic.class);
-        return Result.wrapSuccessfulResult(basicList);
+    Result<TushareData> tushareResult = this.request(tushareParam);
+    if (!tushareResult.isSuccess()) {
+      return tushareResult;
     }
 
-    public Result tradeCal(String exchange, Date startDate, Date endDate){
-        TushareParam tushareParam = tushareParamGem.getParam("trade_cal");
-        tushareParam.setFields(TushareRequestFields.tradeCal);
-        Map<String,Object> param = new HashMap<>();
-        if(StringUtil.isNotBlank(exchange)){
-            param.put("exchange", exchange);
-        }
-        if(startDate != null ){
-            param.put("start_date", DateUtils.formatDate(startDate,DateUtils.YMD));
-        }
-        if(endDate!= null ){
-            param.put("end_date", DateUtils.formatDate(endDate,DateUtils.YMD));
-        }
-        tushareParam.setParams(param);
-        Result<TushareData> tushareResult = this.request(tushareParam);
-        if(!tushareResult.isSuccess()){
-            return tushareResult;
-        }
-        List<TradeCal> tradeCals = TushareDataParser.parse(tushareResult.getData(), TradeCal.class);
-        return Result.wrapSuccessfulResult(tradeCals);
+    List<Basic> basicList = TushareDataParser.parse(tushareResult.getData(), Basic.class);
+    return Result.wrapSuccessfulResult(basicList);
+  }
+
+  public Result tradeCal(String exchange, Date startDate, Date endDate) {
+    TushareParam tushareParam = tushareParamGem.getParam("trade_cal");
+    tushareParam.setFields(TushareRequestFields.tradeCal);
+    Map<String, Object> param = new HashMap<>();
+    if (StringUtil.isNotBlank(exchange)) {
+      param.put("exchange", exchange);
+    }
+    if (startDate != null) {
+      param.put("start_date", DateUtils.formatDate(startDate, DateUtils.YMD));
+    }
+    if (endDate != null) {
+      param.put("end_date", DateUtils.formatDate(endDate, DateUtils.YMD));
+    }
+    tushareParam.setParams(param);
+    Result<TushareData> tushareResult = this.request(tushareParam);
+    if (!tushareResult.isSuccess()) {
+      return tushareResult;
+    }
+    List<TradeCal> tradeCals = TushareDataParser.parse(tushareResult.getData(), TradeCal.class);
+    return Result.wrapSuccessfulResult(tradeCals);
+  }
+
+  public Result daily(String tsCode, Date tradeDate, Date startDate, Date endDate) {
+    TushareParam tushareParam = tushareParamGem.getParam("daily");
+    tushareParam.setFields(TushareRequestFields.daily);
+    Map<String, Object> param = new HashMap<>();
+
+    if (StringUtil.isNotBlank(tsCode)) {
+      param.put("ts_code", tsCode);
+    }
+    if (tradeDate != null) {
+      param.put("trade_date", DateUtils.formatDate(tradeDate, DateUtils.YMD));
+    }
+    if (startDate != null) {
+      param.put("start_date", DateUtils.formatDate(startDate, DateUtils.YMD));
+    }
+    if (endDate != null) {
+      param.put("end_date", DateUtils.formatDate(endDate, DateUtils.YMD));
+    }
+    tushareParam.setParams(param);
+    Result<TushareData> tushareResult = this.request(tushareParam);
+    if (!tushareResult.isSuccess()) {
+      return tushareResult;
     }
 
-    public  Result daily(String tsCode , Date tradeDate , Date startDate, Date endDate){
-        TushareParam tushareParam = tushareParamGem.getParam("daily");
-        tushareParam.setFields(TushareRequestFields.daily);
-        Map<String,Object> param = new HashMap<>();
+    List<Daily> daily = TushareDataParser.parse(tushareResult.getData(), Daily.class);
+    return Result.wrapSuccessfulResult(daily);
+  }
 
-        if(StringUtil.isNotBlank(tsCode)){
-            param.put("ts_code",tsCode);
-        }
-        if(tradeDate != null){
-            param.put("trade_date",DateUtils.formatDate(tradeDate,DateUtils.YMD));
-        }
-        if(startDate != null ){
-            param.put("start_date", DateUtils.formatDate(startDate,DateUtils.YMD));
-        }
-        if(endDate != null ){
-            param.put("end_date", DateUtils.formatDate(endDate,DateUtils.YMD));
-        }
-        tushareParam.setParams(param);
-        Result<TushareData> tushareResult = this.request(tushareParam);
-        if(!tushareResult.isSuccess()){
-            return tushareResult;
-        }
+  public Result adjFactor(String tsCode, Date tradeDate, Date startDate, Date endDate) {
+    TushareParam tushareParam = tushareParamGem.getParam("adj_factor");
+    tushareParam.setFields(TushareRequestFields.adjFactor);
+    Map<String, Object> param = new HashMap<>();
 
-        List<Daily> daily = TushareDataParser.parse(tushareResult.getData(), Daily.class);
-        return Result.wrapSuccessfulResult(daily);
+    if (StringUtil.isNotBlank(tsCode)) {
+      param.put("ts_code", tsCode);
+    }
+    if (tradeDate != null) {
+      param.put("trade_date", DateUtils.formatDate(tradeDate, DateUtils.YMD));
+    }
+    if (startDate != null) {
+      param.put("start_date", DateUtils.formatDate(startDate, DateUtils.YMD));
+    }
+    if (endDate != null) {
+      param.put("end_date", DateUtils.formatDate(endDate, DateUtils.YMD));
+    }
+    tushareParam.setParams(param);
+    Result<TushareData> tushareResult = this.request(tushareParam);
+    if (!tushareResult.isSuccess()) {
+      return tushareResult;
     }
 
-    public Result adjFactor (String tsCode , Date tradeDate , Date startDate, Date endDate){
-        TushareParam tushareParam = tushareParamGem.getParam("adj_factor");
-        tushareParam.setFields(TushareRequestFields.adjFactor);
-        Map<String,Object> param = new HashMap<>();
+    List<AdjFactor> daily = TushareDataParser.parse(tushareResult.getData(), AdjFactor.class);
+    return Result.wrapSuccessfulResult(daily);
+  }
 
-        if(StringUtil.isNotBlank(tsCode)){
-            param.put("ts_code",tsCode);
-        }
-        if(tradeDate != null){
-            param.put("trade_date",DateUtils.formatDate(tradeDate,DateUtils.YMD));
-        }
-        if(startDate != null ){
-            param.put("start_date", DateUtils.formatDate(startDate,DateUtils.YMD));
-        }
-        if(endDate != null ){
-            param.put("end_date", DateUtils.formatDate(endDate,DateUtils.YMD));
-        }
-        tushareParam.setParams(param);
-        Result<TushareData> tushareResult = this.request(tushareParam);
-        if(!tushareResult.isSuccess()){
-            return tushareResult;
-        }
-
-        List<AdjFactor> daily = TushareDataParser.parse(tushareResult.getData(), AdjFactor.class);
-        return Result.wrapSuccessfulResult(daily);
+  private Result<TushareData> request(TushareParam tushareParam) {
+    rateLimiter.acquire();
+    String basic = tushareRequestApi.request(tushareParam);
+    basic = StringEscapeUtils.unescapeJava(basic);
+    Gson gson = JsonUtil.getGsonObj();
+    TushareResult tushareResult = gson.fromJson(basic, new TypeToken<TushareResult>() {
+    }.getType());
+    if (tushareResult.getCode() != 0) {
+      return Result.wrapErrorResult("", tushareResult.getMsg());
     }
-
-    private Result<TushareData> request(TushareParam tushareParam){
-        rateLimiter.acquire();
-        String basic = tushareRequestApi.request(tushareParam);
-        basic = StringEscapeUtils.unescapeJava(basic);
-        Gson gson = JsonUtil.getGsonObj();
-        TushareResult tushareResult = gson.fromJson(basic,new TypeToken<TushareResult>(){}.getType());
-        if(tushareResult.getCode() != 0 ){
-            return Result.wrapErrorResult("",tushareResult.getMsg());
-        }
-        return Result.wrapSuccessfulResult(tushareResult.getData());
-    }
+    return Result.wrapSuccessfulResult(tushareResult.getData());
+  }
 }

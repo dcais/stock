@@ -1,134 +1,134 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace = "org.dcais.stock.stock.dao.mybatis.basic.TradeCalDao">
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dcais.stock.stock.dao.mybatis.basic.TradeCalDao">
 
-    <resultMap id = "BaseResultMap" type = "org.dcais.stock.stock.entity.basic.TradeCal"
-               extends = "COMMON.BASE_RESULT_MAP">
-        <result column = "exchange" property = "exchange" />
-        <result column = "cal_date" property = "calDate" />
-        <result column = "is_open" property = "isOpen" />
-        <result column = "pretrade_date" property = "pretradeDate" />
-    </resultMap>
+  <resultMap id="BaseResultMap" type="org.dcais.stock.stock.entity.basic.TradeCal"
+             extends="COMMON.BASE_RESULT_MAP">
+    <result column="exchange" property="exchange"/>
+    <result column="cal_date" property="calDate"/>
+    <result column="is_open" property="isOpen"/>
+    <result column="pretrade_date" property="pretradeDate"/>
+  </resultMap>
 
-    <sql id = "BaseWhereClause">
-        <where>
-            <trim prefixOverrides = "and">
-                <include refid = "COMMON.BASE_WHERE_CLAUSE" />
-                <if test = "exchange != null">
-                    and exchange = #{exchange}
-                </if>
-                <if test = "calDate != null">
-                    and cal_date = #{calDate}
-                </if>
-                <if test = "isOpen != null">
-                    and is_open = #{isOpen}
-                </if>
-                <if test = "pretradeDate != null">
-                    and pretrade_date = #{pretradeDate}
-                </if>
-            </trim>
-        </where>
-    </sql>
+  <sql id="BaseWhereClause">
+    <where>
+      <trim prefixOverrides="and">
+        <include refid="COMMON.BASE_WHERE_CLAUSE"/>
+        <if test="exchange != null">
+          and exchange = #{exchange}
+        </if>
+        <if test="calDate != null">
+          and cal_date = #{calDate}
+        </if>
+        <if test="isOpen != null">
+          and is_open = #{isOpen}
+        </if>
+        <if test="pretradeDate != null">
+          and pretrade_date = #{pretradeDate}
+        </if>
+      </trim>
+    </where>
+  </sql>
 
-    <sql id = "BaseUpdateSet">
-        <set>
-            <include refid = "COMMON.BASE_UPDATE_SET" />
-            <if test = "exchange != null">
-                exchange = #{exchange},
-            </if>
-            <if test = "calDate != null">
-                cal_date = #{calDate},
-            </if>
-            <if test = "isOpen != null">
-                is_open = #{isOpen},
-            </if>
-            <if test = "pretradeDate != null">
-                pretrade_date = #{pretradeDate}
-            </if>
-        </set>
-    </sql>
+  <sql id="BaseUpdateSet">
+    <set>
+      <include refid="COMMON.BASE_UPDATE_SET"/>
+      <if test="exchange != null">
+        exchange = #{exchange},
+      </if>
+      <if test="calDate != null">
+        cal_date = #{calDate},
+      </if>
+      <if test="isOpen != null">
+        is_open = #{isOpen},
+      </if>
+      <if test="pretradeDate != null">
+        pretrade_date = #{pretradeDate}
+      </if>
+    </set>
+  </sql>
 
-    <!-- 查询总数 -->
-    <select id = "selectCount" resultType = "java.lang.Integer">
-        select count(id)
-        from stock_trade_cal
-        <include refid = "BaseWhereClause" />
-    </select>
+  <!-- 查询总数 -->
+  <select id="selectCount" resultType="java.lang.Integer">
+    select count(id)
+    from stock_trade_cal
+    <include refid="BaseWhereClause"/>
+  </select>
 
-    <!-- 查询 -->
-    <select id = "select" resultMap = "BaseResultMap">
-        select
-        <include refid = "COMMON.ALL_COLUMN_LIST" />
-        from stock_trade_cal
-        <include refid = "BaseWhereClause" />
-        <include refid = "COMMON.ORDER_BY" />
-        <include refid = "COMMON.PAGE" />
-    </select>
+  <!-- 查询 -->
+  <select id="select" resultMap="BaseResultMap">
+    select
+    <include refid="COMMON.ALL_COLUMN_LIST"/>
+    from stock_trade_cal
+    <include refid="BaseWhereClause"/>
+    <include refid="COMMON.ORDER_BY"/>
+    <include refid="COMMON.PAGE"/>
+  </select>
 
-    <!-- 根据ID查询 -->
-    <select id = "selectById" resultMap = "BaseResultMap">
-        select
-        <include refid = "COMMON.ALL_COLUMN_LIST" />
-        from stock_trade_cal
-        where id = #{id}
-        and is_deleted = 'N'
-    </select>
+  <!-- 根据ID查询 -->
+  <select id="selectById" resultMap="BaseResultMap">
+    select
+    <include refid="COMMON.ALL_COLUMN_LIST"/>
+    from stock_trade_cal
+    where id = #{id}
+    and is_deleted = 'N'
+  </select>
 
-    <!-- 根据IDS批量删除 -->
-    <update id = "deleteByIds">
-        update stock_trade_cal
-        set is_deleted='Y'
-        where id in
-        (
-        <foreach collection = "array" index = "index" item = "tag" separator = ",">
-            #{tag}
-        </foreach>
-        )
-    </update>
+  <!-- 根据IDS批量删除 -->
+  <update id="deleteByIds">
+    update stock_trade_cal
+    set is_deleted='Y'
+    where id in
+    (
+    <foreach collection="array" index="index" item="tag" separator=",">
+      #{tag}
+    </foreach>
+    )
+  </update>
 
-    <!-- 根据ID删除 -->
-    <update id = "deleteById">
-        update stock_trade_cal
-        set is_deleted='Y'
-        where id=#{id}
-    </update>
+  <!-- 根据ID删除 -->
+  <update id="deleteById">
+    update stock_trade_cal
+    set is_deleted='Y'
+    where id=#{id}
+  </update>
 
-    <!-- 删除 -->
-    <delete id = "delete">
-        update stock_trade_cal
-        set is_deleted='Y'
-        <include refid = "BaseWhereClause" />
-    </delete>
+  <!-- 删除 -->
+  <delete id="delete">
+    update stock_trade_cal
+    set is_deleted='Y'
+    <include refid="BaseWhereClause"/>
+  </delete>
 
-    <!-- 添加   -->
-    <insert id = "insert" useGeneratedKeys = "true" keyProperty = "id">
-        insert into stock_trade_cal (
-        <include refid = "COMMON.BASE_INSERT_COLUMN" />
-        exchange,
-        cal_date,
-        is_open,
-        pretrade_date
-        )
-        values (
-        <include refid = "COMMON.BASE_INSERT_VALUE" />
-        #{exchange},
-        #{calDate},
-        #{isOpen},
-        #{pretradeDate}
-        )
-    </insert>
+  <!-- 添加   -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    insert into stock_trade_cal (
+    <include refid="COMMON.BASE_INSERT_COLUMN"/>
+    exchange,
+    cal_date,
+    is_open,
+    pretrade_date
+    )
+    values (
+    <include refid="COMMON.BASE_INSERT_VALUE"/>
+    #{exchange},
+    #{calDate},
+    #{isOpen},
+    #{pretradeDate}
+    )
+  </insert>
 
-    <!-- 通过ID更新 -->
-    <update id = "updateById">
-        update stock_trade_cal
-        <include refid = "BaseUpdateSet" />
-        where id = #{id}
-    </update>
+  <!-- 通过ID更新 -->
+  <update id="updateById">
+    update stock_trade_cal
+    <include refid="BaseUpdateSet"/>
+    where id = #{id}
+  </update>
 
-    <select id = "selectMaxCalDate" resultType = "java.util.Date">
-        select max(cal_date)
-        from stock_trade_cal
-        where exchange = #{exchange}
-    </select>
+  <select id="selectMaxCalDate" resultType="java.util.Date">
+    select max(cal_date)
+    from stock_trade_cal
+    where exchange = #{exchange}
+  </select>
 </mapper>

@@ -13,7 +13,6 @@ import org.dcais.stock.stock.dao.mybatis.basic.TradeCalDao;
 import org.dcais.stock.stock.entity.basic.TradeCal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
- 
 
 
 @Service
@@ -28,11 +27,11 @@ public class TradeCalServiceImpl extends BaseServiceImpl implements TradeCalServ
     return super.getAll(calDateDao);
   }
 
-  public List<TradeCal> select(Map<String,Object> param){
+  public List<TradeCal> select(Map<String, Object> param) {
     return calDateDao.select(param);
   }
 
-  public Integer selectCount(Map<String,Object> param){
+  public Integer selectCount(Map<String, Object> param) {
     return calDateDao.selectCount(param);
   }
 
@@ -53,28 +52,28 @@ public class TradeCalServiceImpl extends BaseServiceImpl implements TradeCalServ
   }
 
   @Override
-  public Result sync(){
-    String []  exchanges = {BizConstans.EXCHANGE_SSE,BizConstans.EXCHANGE_SZSE};
+  public Result sync() {
+    String[] exchanges = {BizConstans.EXCHANGE_SSE, BizConstans.EXCHANGE_SZSE};
 
-    Function<String,Void> f = exchange -> {
+    Function<String, Void> f = exchange -> {
       Date startDate = calDateDao.selectMaxCalDate(exchange);
-      Result r = stockInfoService.tradeCal(exchange,startDate,null);
-      if(!r.isSuccess()){
+      Result r = stockInfoService.tradeCal(exchange, startDate, null);
+      if (!r.isSuccess()) {
         return null;
       }
 
       List<TradeCal> tradeCals = (List<TradeCal>) r.getData();
-      tradeCals.forEach( tradeCal -> {
-          Map<String,Object> params = new HashMap<>();
-          params.put("isDeleted","N");
-          params.put("exchange", tradeCal.getExchange());
-          params.put("calDate",tradeCal.getCalDate());
+      tradeCals.forEach(tradeCal -> {
+        Map<String, Object> params = new HashMap<>();
+        params.put("isDeleted", "N");
+        params.put("exchange", tradeCal.getExchange());
+        params.put("calDate", tradeCal.getCalDate());
 
-          List<TradeCal> tmps = calDateDao.select(params);
-          if(tmps.size() > 0){
-              return;
-          }
-          this.save(tradeCal);
+        List<TradeCal> tmps = calDateDao.select(params);
+        if (tmps.size() > 0) {
+          return;
+        }
+        this.save(tradeCal);
       });
       return null;
     };

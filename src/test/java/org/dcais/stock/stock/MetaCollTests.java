@@ -30,13 +30,13 @@ public class MetaCollTests extends AbstractTestNGSpringContextTests {
   @Test
   public void add() {
     Date now = new Date();
-    xMetaCollDao.put("123",now);
+    xMetaCollDao.put("123", now);
   }
 
   @Test
-  public void find(){
+  public void find() {
     Object a = xMetaCollDao.get("123");
-    Date date = CommonUtils.getValue(a,Date.class);
+    Date date = CommonUtils.getValue(a, Date.class);
     log.info(date.toString());
   }
 

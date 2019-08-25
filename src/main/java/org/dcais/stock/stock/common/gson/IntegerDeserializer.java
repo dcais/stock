@@ -9,13 +9,13 @@ import java.lang.reflect.Type;
 
 public class IntegerDeserializer implements JsonDeserializer<Integer> {
 
-    @Override
-    public Integer deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
-        try {
-            return element.getAsInt();
-        } catch (NumberFormatException e) {
-            return null;
-        }
+  @Override
+  public Integer deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
+    try {
+      return element.getAsInt();
+    } catch (NumberFormatException e) {
+      return null;
     }
+  }
 
 }

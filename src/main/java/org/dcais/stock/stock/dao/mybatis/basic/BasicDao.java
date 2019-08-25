@@ -10,7 +10,7 @@ import java.util.Map;
 @Mapper
 public interface BasicDao extends BaseDao<Basic> {
 
-    public List<Basic> select(Map<String, Object> params);
+  public List<Basic> select(Map<String, Object> params);
 
-    public Integer selectCount(Map<String, Object> params);
+  public Integer selectCount(Map<String, Object> params);
 }

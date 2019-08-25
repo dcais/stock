@@ -8,9 +8,9 @@ import java.lang.reflect.Method;
 
 @Data
 public class ParseFieldInfo {
-    private Field targetField;
-    private Method targetSetMethod;
+  private Field targetField;
+  private Method targetSetMethod;
 
-    private TuShareField tuShareField;
+  private TuShareField tuShareField;
 
 }

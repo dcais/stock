@@ -8,14 +8,14 @@ import java.util.HashMap;
 
 @Component
 public class TushareParamGem {
-    @Value("${tushare.token}")
-    private String token;
+  @Value("${tushare.token}")
+  private String token;
 
-    public TushareParam getParam(String apiName){
-        TushareParam param = new TushareParam();
-        param.setApiName(apiName);
-        param.setToken(token);
-        param.setParams( new HashMap<String,Object>());
-        return param;
-    }
+  public TushareParam getParam(String apiName) {
+    TushareParam param = new TushareParam();
+    param.setApiName(apiName);
+    param.setToken(token);
+    param.setParams(new HashMap<String, Object>());
+    return param;
+  }
 }

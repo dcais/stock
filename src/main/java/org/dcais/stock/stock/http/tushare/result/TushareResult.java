@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class TushareResult {
 
-    @SerializedName("request_id")
-    private String requestId;
-    private Integer code;
-    private String msg;
-    private TushareData data;
+  @SerializedName("request_id")
+  private String requestId;
+  private Integer code;
+  private String msg;
+  private TushareData data;
 
 }

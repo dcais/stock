@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class XDevApiPoolingProperties {
   private Pooling pooling;
+
   @Data
   public static class Pooling {
     @NotNull

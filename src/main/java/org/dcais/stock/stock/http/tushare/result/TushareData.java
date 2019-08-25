@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class TushareData {
-    private List<String> fields;
-    private List<List<Object>> items;
+  private List<String> fields;
+  private List<List<Object>> items;
 }

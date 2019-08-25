@@ -10,13 +10,13 @@ import java.math.BigDecimal;
 
 public class BigDecimalDeserializer implements JsonDeserializer<BigDecimal> {
 
-    @Override
-    public BigDecimal deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
-        try {
-            return element.getAsBigDecimal();
-        } catch (NumberFormatException e) {
-            return null;
-        }
+  @Override
+  public BigDecimal deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
+    try {
+      return element.getAsBigDecimal();
+    } catch (NumberFormatException e) {
+      return null;
     }
+  }
 
 }

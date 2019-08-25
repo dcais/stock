@@ -9,33 +9,33 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping(value="/")
+@RequestMapping(value = "/")
 public class StockController {
-    @Autowired
-    private BasicService basicService;
-    @Autowired
-    private TradeCalService tradeCalService;
+  @Autowired
+  private BasicService basicService;
+  @Autowired
+  private TradeCalService tradeCalService;
 
 
-    @RequestMapping(value="/syncBasic",method = RequestMethod.GET)
-    @ResponseBody
-    public Result syncBasic(){
-        return basicService.sync();
-    }
+  @RequestMapping(value = "/syncBasic", method = RequestMethod.GET)
+  @ResponseBody
+  public Result syncBasic() {
+    return basicService.sync();
+  }
 
-    @RequestMapping(value="/syncTradeCal",method = RequestMethod.GET)
-    @ResponseBody
-    public Result syncTradeCal(){
-        return tradeCalService.sync();
-    }
+  @RequestMapping(value = "/syncTradeCal", method = RequestMethod.GET)
+  @ResponseBody
+  public Result syncTradeCal() {
+    return tradeCalService.sync();
+  }
 
 
-    @RequestMapping(value="/logLevelTest",method = RequestMethod.GET)
-    @ResponseBody
-    public Result logLevelTest() {
-        log.info("info");
-        log.debug("debug");
-        return Result.wrapSuccessfulResult("");
-    }
+  @RequestMapping(value = "/logLevelTest", method = RequestMethod.GET)
+  @ResponseBody
+  public Result logLevelTest() {
+    log.info("info");
+    log.debug("debug");
+    return Result.wrapSuccessfulResult("");
+  }
 
 }

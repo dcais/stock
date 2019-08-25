@@ -4,20 +4,20 @@ import java.lang.reflect.Field;
 
 public abstract class AbstractConvert implements ConvertExtendInterface {
 
-    /**
-     * @param returnValue get方法返回的对象
-     * @param targetField 目标属性的类型
-     * @return
-     */
-    public Object convert(Object returnValue, Field targetField) {
-        return convert(returnValue, targetField.getType());
-    }
+  /**
+   * @param returnValue get方法返回的对象
+   * @param targetField 目标属性的类型
+   * @return
+   */
+  public Object convert(Object returnValue, Field targetField) {
+    return convert(returnValue, targetField.getType());
+  }
 
-    /**
-     * @param returnValue get方法返回的对象
-     * @param targetField 目标属性的类型
-     * @return
-     */
-    public abstract Object convert(Object returnValue, Class<?> targetFieldClass);
+  /**
+   * @param returnValue get方法返回的对象
+   * @param targetField 目标属性的类型
+   * @return
+   */
+  public abstract Object convert(Object returnValue, Class<?> targetFieldClass);
 
 }

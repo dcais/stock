@@ -23,17 +23,18 @@ public final class JsonUtil {
 
   private static ObjectMapper mapper = new ObjectMapper();
 
-  private JsonUtil(){}
+  private JsonUtil() {
+  }
 
-  public static Gson getGsonObj(){
+  public static Gson getGsonObj() {
     return getCommonGsonBuilder().create();
   }
 
-  public static Gson getNameWithUnderscoresGsonObj(){
+  public static Gson getNameWithUnderscoresGsonObj() {
     return getCommonGsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
   }
 
-  public static GsonBuilder getCommonGsonBuilder(){
+  public static GsonBuilder getCommonGsonBuilder() {
     return new GsonBuilder()
       .excludeFieldsWithModifiers(STATIC)
       .excludeFieldsWithModifiers(TRANSIENT)
@@ -44,13 +45,15 @@ public final class JsonUtil {
       .registerTypeAdapter(Integer.class, new IntegerDeserializer());
   }
 
-  public static <T>List<T> fromJsonList(String json,Class<T> clazz){
+  public static <T> List<T> fromJsonList(String json, Class<T> clazz) {
     Gson gson = getGsonObj();
-    return gson.fromJson(json, new TypeToken<List<T>>(){}.getType());
+    return gson.fromJson(json, new TypeToken<List<T>>() {
+    }.getType());
   }
 
   /**
    * 对象转换成json字符串
+   *
    * @param obj
    * @return
    */
@@ -61,6 +64,7 @@ public final class JsonUtil {
 
   /**
    * json字符串转成对象
+   *
    * @param str
    * @param type
    * @return
@@ -72,6 +76,7 @@ public final class JsonUtil {
 
   /**
    * json字符串转成对象
+   *
    * @param str
    * @param type
    * @return
@@ -89,7 +94,7 @@ public final class JsonUtil {
   public static <T> List<T> stringToList(String jsonString, Class<T[]> type) {
 
     Gson gson = new Gson();
-    T[] list  = gson.fromJson(jsonString, type);
+    T[] list = gson.fromJson(jsonString, type);
 
     return Arrays.asList(list);
 

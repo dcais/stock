@@ -23,8 +23,8 @@ public class XDevApiConfig {
     ObjectMapper objectMapper = new ObjectMapper();
     XDevApiPoolingProperties properties = null;
 
-    if ( AopUtils.isAopProxy(poolingProperties)){
-      poolingProperties = (XDevApiPoolingProperties) ((Advised)poolingProperties).getTargetSource().getTarget();
+    if (AopUtils.isAopProxy(poolingProperties)) {
+      poolingProperties = (XDevApiPoolingProperties) ((Advised) poolingProperties).getTargetSource().getTarget();
     }
     String jsonStrProps = JsonUtil.getGsonObj().toJson(poolingProperties);
 

@@ -13,15 +13,15 @@ import java.util.Map;
 @Mapper
 public interface DailyDao extends BaseDao<Daily> {
 
-    List<Daily> select(Map<String, Object> params);
+  List<Daily> select(Map<String, Object> params);
 
-    Integer selectCount(Map<String, Object> params);
+  Integer selectCount(Map<String, Object> params);
 
-    List<Daily> getMaxDaily(String tsCode);
+  List<Daily> getMaxDaily(String tsCode);
 
-    Integer batchInsert(@Param("list")List<Daily> dailies);
+  Integer batchInsert(@Param("list") List<Daily> dailies);
 
-    List<Daily> getMinLastDate();
+  List<Daily> getMinLastDate();
 
-    int deleteDateAfterDate(@Param("tradeDate") Date tradeDate);
+  int deleteDateAfterDate(@Param("tradeDate") Date tradeDate);
 }

@@ -26,7 +26,6 @@ public class DailyController {
   public Result syncAll(String mode) {
     if (StringUtil.isBlank(mode)) {
       mode = CmnConstants.SYNC_MODE_DATE;
-
     }
     dailyService.syncAll(mode);
     return Result.wrapSuccessfulResult("OK");

@@ -19,8 +19,8 @@ public class MetaController {
 
   @RequestMapping("set")
   @ResponseBody
-  public Result set(@RequestBody @Valid  MetaSetParam param){
-    xMetaCollDao.put(param.getKey(),param.getValue());
+  public Result set(@RequestBody @Valid MetaSetParam param) {
+    xMetaCollDao.put(param.getKey(), param.getValue());
     return Result.wrapSuccessfulResult("");
   }
 

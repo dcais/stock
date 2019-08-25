@@ -9,13 +9,13 @@ import java.lang.reflect.Type;
 
 public class LongDeserializer implements JsonDeserializer<Long> {
 
-    @Override
-    public Long deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
-        try {
-            return element.getAsLong();
-        } catch (NumberFormatException e) {
-            return null;
-        }
+  @Override
+  public Long deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
+    try {
+      return element.getAsLong();
+    } catch (NumberFormatException e) {
+      return null;
     }
+  }
 
 }

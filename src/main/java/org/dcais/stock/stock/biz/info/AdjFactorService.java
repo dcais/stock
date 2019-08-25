@@ -24,7 +24,7 @@ public interface AdjFactorService {
   int deleteByIds(Long[] ids);
 
 
-  void syncAll();
+  void syncAll(String mode);
 
   Result syncHistory(String symbol);
 }

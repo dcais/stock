@@ -33,11 +33,11 @@ public class BasicServiceImpl extends BaseServiceImpl implements BasicService {
     return super.getAll(basicDao);
   }
 
-  public List<Basic> select(Map<String,Object> param){
+  public List<Basic> select(Map<String, Object> param) {
     return basicDao.select(param);
   }
 
-  public Integer selectCount(Map<String,Object> param){
+  public Integer selectCount(Map<String, Object> param) {
     return basicDao.selectCount(param);
   }
 
@@ -61,9 +61,9 @@ public class BasicServiceImpl extends BaseServiceImpl implements BasicService {
 
   @Override
   public Result sync() {
-    Function<String,Void> syncStatus = status -> {
-      Result rStockInfo =  stockInfoService.stockBasicInfo(status);
-      if(!rStockInfo.isSuccess()){
+    Function<String, Void> syncStatus = status -> {
+      Result rStockInfo = stockInfoService.stockBasicInfo(status);
+      if (!rStockInfo.isSuccess()) {
         log.error(JsonUtil.toJson(rStockInfo));
         return null;
       }
@@ -84,7 +84,7 @@ public class BasicServiceImpl extends BaseServiceImpl implements BasicService {
       return null;
     };
 
-    String[] status = {BizConstans.LIST_STATUS_L,BizConstans.LIST_STATUS_D,BizConstans.LIST_STATUS_P};
+    String[] status = {BizConstans.LIST_STATUS_L, BizConstans.LIST_STATUS_D, BizConstans.LIST_STATUS_P};
     Arrays.stream(status).forEach(syncStatus::apply);
     return Result.wrapSuccessfulResult("OK");
   }
@@ -95,14 +95,14 @@ public class BasicServiceImpl extends BaseServiceImpl implements BasicService {
     param.put("isDeleted", "N");
     param.put("symbol", symbol);
     List<Basic> tmps = this.select(param);
-    if(ListUtil.isBlank(tmps)){
+    if (ListUtil.isBlank(tmps)) {
       return null;
     }
     return tmps.get(0);
   }
 
   @Override
-  public List<Basic> getAllList(){
+  public List<Basic> getAllList() {
     Map<String, Object> param = new HashMap<>();
     param.put("isDeleted", "N");
     param.put("listStatus", "L");

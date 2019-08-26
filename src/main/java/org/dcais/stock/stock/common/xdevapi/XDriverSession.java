@@ -10,7 +10,7 @@ public class XDriverSession {
   @Autowired
   private Client xDevApiClient;
 
-  public Session getSesssion() {
+  public Session getSession() {
     return xDevApiClient.getSession();
   }
 }

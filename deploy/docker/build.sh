@@ -11,5 +11,5 @@ STOCK_VER=$(ls -al target/ | grep 'stock.*\.jar$'  | awk '{print $9}' | sed 's/s
 cp ./target/${JAR_FILE} ./deploy/docker/jar
 
 cd ${DOCKER_BUILD_PATH}
-
+echo "docker build -t dockersai/stock:v${STOCK_VER} --build-arg STOCK_VER=${STOCK_VER} ."
 docker build -t dockersai/stock:v${STOCK_VER} --build-arg STOCK_VER=${STOCK_VER} .

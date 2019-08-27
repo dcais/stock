@@ -5,14 +5,14 @@ import com.google.gson.reflect.TypeToken;
 import com.mysql.cj.xdevapi.*;
 import lombok.Getter;
 import org.dcais.stock.stock.common.utils.JsonUtil;
-import org.dcais.stock.stock.dao.xdriver.common.XCommonCollDao;
+import org.dcais.stock.stock.dao.xdriver.common.XCommon;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class XMetaCollDao extends XCommonCollDao {
+public class XMetaCollDao extends XCommon {
 
   @Getter
   private String collName = "stock_x_meta";
@@ -24,13 +24,11 @@ public class XMetaCollDao extends XCommonCollDao {
     String jsonString = JsonUtil.toJson(map);
     Collection collection = getCollection();
     collection.addOrReplaceOne(key, jsonString);
-    collection.getSession().close();
   }
 
   public Object get(String key) {
     Collection collection = getCollection();
     DbDoc dbDoc = collection.getOne(key);
-    collection.getSession().close();
     if (dbDoc == null) {
       return null;
     }

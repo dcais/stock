@@ -203,4 +203,13 @@ public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorSe
     }
     this.save(factor);
   }
+
+  @Override
+  public Result<AdjFactor> getMaxDaily(String tsCode){
+    List<AdjFactor> adjFactors = adjFactorDao.getMaxDaily(tsCode);
+    if(ListUtil.isBlank(adjFactors)){
+      Result.wrapErrorResult("","cannot find max adjFactor");
+    }
+    return Result.wrapSuccessfulResult(adjFactors.get(0));
+  }
 }

@@ -27,4 +27,6 @@ public interface AdjFactorService {
   void syncAll(String mode);
 
   Result syncHistory(String symbol);
+
+  Result<AdjFactor> getMaxDaily(String tsCode);
 }

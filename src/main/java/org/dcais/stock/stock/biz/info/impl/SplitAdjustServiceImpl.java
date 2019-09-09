@@ -97,6 +97,7 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
           return calc(t,adjFactorDaily,adjFactorLatest);
         }).collect(Collectors.toList());
 
+
       xSplitAdjustedDailyDao.insertList(splits);
     }
     saveLatestAdjFactorToStockMeta(adjFactorLatest);

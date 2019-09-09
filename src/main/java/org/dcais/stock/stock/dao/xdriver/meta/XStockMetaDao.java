@@ -29,6 +29,9 @@ public class XStockMetaDao extends XCommon {
   public String getStockMeta(String tsCode, String key){
     Collection col  = getCollection();
     DbDoc dbDoc = col.getOne(tsCode);
+    if(dbDoc == null ){
+      return null;
+    }
     JsonString jsonValue = (JsonString) dbDoc.get(key);
     return jsonValue.getString();
   }

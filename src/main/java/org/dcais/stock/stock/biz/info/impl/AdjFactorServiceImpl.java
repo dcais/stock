@@ -178,13 +178,17 @@ public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorSe
       Calendar calendar = Calendar.getInstance();
       calendar.setTime(startDate);
       calendar.add(calendar.YEAR, 2);
+
+      Date nextStartDate = calendar.getTime();
+      calendar.add(calendar.DATE, -1);
+
       Date endDate = calendar.getTime();
       Result result = stockInfoService.adjFactor(basic.getTsCode(), null, startDate, endDate);
       if (!result.isSuccess()) {
         log.error(result.getErrorMsg());
         break;
       }
-      startDate = endDate;
+      startDate = nextStartDate;
       List<AdjFactor> dailyList = (List<AdjFactor>) result.getData();
       this.batchInsert(dailyList);
     }

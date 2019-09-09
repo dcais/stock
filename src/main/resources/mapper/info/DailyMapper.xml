@@ -51,6 +51,15 @@
         <if test="amount != null">
           and amount = #{amount}
         </if>
+        <if test="gtId != null">
+          and id > #{gtId}
+        </if>
+        <if test="gtTradeDate != null">
+          and trade_date > #{gtTradeDate}
+        </if>
+        <if test="lteTradeDate != null">
+          and #{lteTradeDate} >= trade_date
+        </if>
       </trim>
     </where>
   </sql>
@@ -240,4 +249,5 @@
   <update id="deleteDateAfterDate">
     delete from stock_daily where trade_date >= #{tradeDate};
   </update>
+
 </mapper>

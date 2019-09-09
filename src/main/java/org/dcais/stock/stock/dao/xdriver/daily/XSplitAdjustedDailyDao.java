@@ -1,6 +1,8 @@
 package org.dcais.stock.stock.dao.xdriver.daily;
 
 import com.mysql.cj.xdevapi.Collection;
+import com.mysql.cj.xdevapi.DbDoc;
+import com.mysql.cj.xdevapi.DocResult;
 import lombok.Getter;
 import org.dcais.stock.stock.common.utils.JsonUtil;
 import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexDef;
@@ -10,7 +12,6 @@ import org.dcais.stock.stock.dao.xdriver.common.XCommon;
 import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,10 +49,26 @@ public class XSplitAdjustedDailyDao extends XCommon {
       JsonUtil::toJson
     ).toArray(String[]::new);
     Collection col = getCollection();
-    col.add(arrayDaily);
+    col.add(arrayDaily).execute();
   }
 
   public void remove(String tsCode) {
+    Collection col = getCollection();
+    col.remove("tsCode=:tsCode").bind("tsCode",tsCode).execute();
+  }
+
+  public SplitAdjustedDaily getLatest(String tsCode) {
+    Collection col = getCollection();
+    DocResult docs = col.find("tsCode=:tsCode").sort("tradeDate desc").limit(1).bind("tsCode",tsCode).execute();
+    if(!docs.hasData()){
+      return null;
+    }
+    DbDoc dbDoc = docs.fetchOne();
+    if(dbDoc == null ){
+      return null;
+    }
+    SplitAdjustedDaily  splitAdjustedDaily = JsonUtil.getGsonObj().fromJson( dbDoc.toString(), SplitAdjustedDaily.class );
+    return splitAdjustedDaily;
   }
 
 

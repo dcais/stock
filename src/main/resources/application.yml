@@ -14,7 +14,8 @@ spring:
     time-zone: GMT+8
 
 stock:
-  batch-inser-size: 10
+  batch-size: 3000
+  batch-insert-size: 1000
   proxy:
     ip: 127.0.0.1:8080
     use-proxy: false

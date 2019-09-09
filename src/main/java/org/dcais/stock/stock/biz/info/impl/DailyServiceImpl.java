@@ -177,13 +177,18 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
       Calendar calendar = Calendar.getInstance();
       calendar.setTime(startDate);
       calendar.add(calendar.YEAR, 2);
+
+      Date nextStartDate = calendar.getTime();
+      calendar.add(calendar.DATE, -1);
+
       Date endDate = calendar.getTime();
       Result result = stockInfoService.daily(basic.getTsCode(), null, startDate, endDate);
       if (!result.isSuccess()) {
         log.error(result.getErrorMsg());
         break;
       }
-      startDate = endDate;
+      
+      startDate = nextStartDate;
       List<Daily> dailyList = (List<Daily>) result.getData();
       this.batchInsert(dailyList);
     }

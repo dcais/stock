@@ -23,6 +23,15 @@
         <if test="adjFactor != null">
           and adj_factor = #{adjFactor}
         </if>
+        <if test="gtId != null">
+          and id > #{gtId}
+        </if>
+        <if test="gtTradeDate != null">
+          and trade_date > #{gtTradeDate}
+        </if>
+        <if test="lteTradeDate != null">
+          and #{lteTradeDate} >= trade_date
+        </if>
       </trim>
     </where>
   </sql>

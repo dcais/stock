@@ -33,7 +33,7 @@ public class SessionHolder {
       return;
     }
     if(curSession.isOpen()){
-      if( this.referenceCount == 0 ){
+      if( this.referenceCount <= 0 ){
         curSession.close();
         curSession = null;
       }

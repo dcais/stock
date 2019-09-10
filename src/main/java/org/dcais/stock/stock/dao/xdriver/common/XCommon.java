@@ -1,6 +1,7 @@
 package org.dcais.stock.stock.dao.xdriver.common;
 
 import com.mysql.cj.xdevapi.*;
+import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.common.utils.JsonUtil;
 import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.common.utils.StringUtil;
@@ -9,13 +10,21 @@ import org.dcais.stock.stock.common.xdevapi.XDriveSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 public abstract class XCommon {
 
   protected abstract String getCollName();
+
+  @PostConstruct
+  public void postContruct(){
+    this.getCollection();
+  }
+
   @Autowired
   private Client xDevApiClient;
 

@@ -28,7 +28,7 @@ public class XMetaCollDao extends XCommon {
 
   public Object get(String key) {
     Collection collection = getCollection();
-    DocResult docs = collection.find("_id = :id").bind("id",tsCode).execute();
+    DocResult docs = collection.find("_id = :id").bind("id",key).execute();
     if(docs == null) {
       return null;
     }

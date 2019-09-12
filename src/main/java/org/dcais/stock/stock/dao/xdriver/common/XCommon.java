@@ -22,7 +22,7 @@ public abstract class XCommon {
 
   @PostConstruct
   public void postContruct(){
-    this.getCollection();
+    this.initCollection();
   }
 
   @Autowired
@@ -36,8 +36,7 @@ public abstract class XCommon {
     SessionHolder sessionHolder = XDriveSessionManager.getSessionHolder(xDevApiClient);
     return sessionHolder.getSession();
   }
-
-  protected Collection getCollection() {
+  protected void initCollection(){
     Session session = this.getSession();
     Schema schema = session.getDefaultSchema();
     Collection collection = schema.getCollection(getCollName());
@@ -46,13 +45,19 @@ public abstract class XCommon {
       CollectionIndexInterface collectionIndexInterface = this.getCollectionIndexInterface();
       if (
         collectionIndexInterface != null
-        && ListUtil.isNotBlank(collectionIndexInterface.indexInfo())){
+          && ListUtil.isNotBlank(collectionIndexInterface.indexInfo())){
         Collection finalCollection = collection;
         collectionIndexInterface.indexInfo().forEach(collectionIndexInfo -> {
-          Result r =this.createIndex(finalCollection,collectionIndexInfo);
-       });
+          this.createIndex(finalCollection,collectionIndexInfo);
+        });
       }
     }
+  }
+
+  protected Collection getCollection() {
+    Session session = this.getSession();
+    Schema schema = session.getDefaultSchema();
+    Collection collection = schema.getCollection(getCollName());
     return collection;
   }
 

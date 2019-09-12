@@ -24,7 +24,7 @@ public class XSplitAdjustDailyDaoTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private XSplitAdjustedDailyDao xSplitAdjustedDailyDao;
 
-  @Test(enabled =  false)
+  @Test
   public void add() {
     Date now = new Date();
     SplitAdjustedDaily splitAdjustedDaily = new SplitAdjustedDaily();

@@ -28,10 +28,14 @@ public class XMetaCollDao extends XCommon {
 
   public Object get(String key) {
     Collection collection = getCollection();
-    DbDoc dbDoc = collection.getOne(key);
-    if (dbDoc == null) {
+    DocResult docs = collection.find("_id = :id").bind("id",tsCode).execute();
+    if(docs == null) {
       return null;
     }
+    if(docs.count() == 0){
+      return null;
+    }
+    DbDoc dbDoc = docs.fetchOne();
     Gson gson = JsonUtil.getGsonObj();
     Map<String, Object> map = gson.fromJson(dbDoc.toString(), new TypeToken<Map<String, Object>>() {
     }.getType());

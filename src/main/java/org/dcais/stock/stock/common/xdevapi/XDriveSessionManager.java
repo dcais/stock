@@ -34,6 +34,7 @@ public class XDriveSessionManager {
     if(
       sessionHolder != null
         && ( sessionHolder.getSession()==null
+        || sessionHolder.isClosed()
         || !sessionHolder.getSession().isOpen()
       )){
       map.remove(client);
@@ -55,6 +56,7 @@ public class XDriveSessionManager {
     if(
       oldSessionHolder != null
       && ( oldSessionHolder.getSession()==null
+           || oldSessionHolder.isClosed()
            || !oldSessionHolder.getSession().isOpen()
        )){
       oldSessionHolder = null;

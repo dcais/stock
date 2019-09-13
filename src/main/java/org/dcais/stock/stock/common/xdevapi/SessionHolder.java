@@ -1,6 +1,7 @@
 package org.dcais.stock.stock.common.xdevapi;
 
 import com.mysql.cj.xdevapi.Session;
+import lombok.Getter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -11,6 +12,8 @@ public class SessionHolder {
 
   private boolean transactionActive = false;
   private int referenceCount = 0;
+  @Getter
+  private boolean closed = false;
 
   public SessionHolder(Session session) {
     Assert.notNull(session, "Active Session is required");
@@ -35,6 +38,7 @@ public class SessionHolder {
     if(curSession.isOpen()){
       if( this.referenceCount <= 0 ){
         curSession.close();
+        this.closed= true;
         curSession = null;
       }
     }

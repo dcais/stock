@@ -104,6 +104,18 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
     return Result.wrapSuccessfulResult("OK");
   }
 
+  @Override
+  public Result<List<SplitAdjustedDaily>> getSplitAdjustDailyList(String tsCode, Date gteDate) {
+    if(StringUtil.isBlank(tsCode)){
+      return Result.wrapErrorResult("","no ts code");
+    }
+    if(gteDate == null ){
+      gteDate = DateUtils.smartFormat("1970-01-01");
+    }
+    List<SplitAdjustedDaily> datas = this.xSplitAdjustedDailyDao.getFromDate(tsCode,gteDate);
+    return Result.wrapSuccessfulResult(datas);
+  }
+
   private BigDecimal calc(BigDecimal d, BigDecimal adj, BigDecimal adjLatest){
     if(adj.equals(adjLatest)){
       return d.multiply(BigDecimal.ONE);

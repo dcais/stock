@@ -56,6 +56,7 @@ public class StockController {
     dailyService.syncAll(CmnConstants.SYNC_MODE_DATE);
     adjFactorService.syncAll(CmnConstants.SYNC_MODE_DATE);
     splitAdjustTask.startCalc();
+
     return Result.wrapSuccessfulResult("OK");
   }
 }

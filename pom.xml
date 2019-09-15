@@ -88,6 +88,10 @@
       <artifactId>ta-lib</artifactId>
       <classifier>sources</classifier>
     </dependency>
+    <dependency>
+      <groupId>joinery</groupId>
+      <artifactId>joinery-dataframe</artifactId>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>
@@ -155,6 +159,11 @@
         <artifactId>ta-lib</artifactId>
         <version>0.4.0</version>
         <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <groupId>joinery</groupId>
+        <artifactId>joinery-dataframe</artifactId>
+        <version>1.9</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -62,11 +62,11 @@ public class XDriveSessionManager {
       oldSessionHolder = null;
     }
     if(oldSessionHolder != null){
-      throw new IllegalStateException("Already value [" + oldSessionHolder + "] for key [" +
+      throw new IllegalStateException("Already value [" + oldSessionHolder + "] for tecName [" +
         client + "] bound to thread [" + Thread.currentThread().getName() + "]");
     }
     if (log.isTraceEnabled()) {
-      log.trace("Bound value [" + sessionHolder + "] for key [" + client + "] to thread [" +
+      log.trace("Bound value [" + sessionHolder + "] for tecName [" + client + "] to thread [" +
         Thread.currentThread().getName() + "]");
     }
 
@@ -75,7 +75,7 @@ public class XDriveSessionManager {
     SessionHolder value = doUnbindSession(key);
     if (value == null) {
       throw new IllegalStateException(
-        "No value for key [" + key + "] bound to thread [" + Thread.currentThread().getName() + "]");
+        "No value for tecName [" + key + "] bound to thread [" + Thread.currentThread().getName() + "]");
     }
     return value;
   }
@@ -102,7 +102,7 @@ public class XDriveSessionManager {
     }
 
     if (value != null && log.isTraceEnabled()) {
-      log.trace("Removed value [" + value + "] for key [" + actualKey + "] from thread [" +
+      log.trace("Removed value [" + value + "] for tecName [" + actualKey + "] from thread [" +
         Thread.currentThread().getName() + "]");
     }
     return value;

@@ -1,6 +1,7 @@
 package org.dcais.stock.stock.dao;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.JsonUtil;
 import org.dcais.stock.stock.dao.xdriver.daily.XSplitAdjustedDailyDao;
 import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
@@ -24,7 +25,7 @@ public class XSplitAdjustDailyDaoTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private XSplitAdjustedDailyDao xSplitAdjustedDailyDao;
 
-  @Test
+  @Test(enabled = false)
   public void add() {
     Date now = new Date();
     SplitAdjustedDaily splitAdjustedDaily = new SplitAdjustedDaily();
@@ -36,16 +37,22 @@ public class XSplitAdjustDailyDaoTest extends AbstractTestNGSpringContextTests {
     xSplitAdjustedDailyDao.insertList(list);
   }
 
-  @Test(enabled = true)
+  @Test(enabled = false)
   void remove() {
     xSplitAdjustedDailyDao.remove("123546");
   }
 
-  @Test
+  @Test(enabled = false)
   public void find() {
     SplitAdjustedDaily splitAdjustedDaily = xSplitAdjustedDailyDao.getLatest("123546");
     log.info(""+ JsonUtil.toJson(splitAdjustedDaily));
   }
 
+  @Test
+  public void getFromDate(){
+    List<SplitAdjustedDaily> list = xSplitAdjustedDailyDao.getFromDate("000001.SZ", DateUtils.smartFormat("2001-01-03"));
+    log.info(JsonUtil.toJson(list.get(0)));
+
+  }
 
 }

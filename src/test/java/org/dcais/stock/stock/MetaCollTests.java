@@ -40,4 +40,11 @@ public class MetaCollTests extends AbstractTestNGSpringContextTests {
     log.info(date.toString());
   }
 
+  @Test
+  public void findSmaList(){
+    List<Double> list = (List) xMetaCollDao.get("SmaList");
+
+
+  }
+
 }

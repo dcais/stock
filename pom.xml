@@ -78,16 +78,16 @@
       <groupId>com.tictactec</groupId>
       <artifactId>ta-lib</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.tictactec</groupId>
-      <artifactId>ta-lib</artifactId>
-      <classifier>javadoc</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.tictactec</groupId>
-      <artifactId>ta-lib</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.tictactec</groupId>-->
+<!--      <artifactId>ta-lib</artifactId>-->
+<!--      <classifier>javadoc</classifier>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>com.tictactec</groupId>-->
+<!--      <artifactId>ta-lib</artifactId>-->
+<!--      <classifier>sources</classifier>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>joinery</groupId>
       <artifactId>joinery-dataframe</artifactId>
@@ -148,18 +148,18 @@
         <artifactId>ta-lib</artifactId>
         <version>0.4.0</version>
       </dependency>
-      <dependency>
-        <groupId>com.tictactec</groupId>
-        <artifactId>ta-lib</artifactId>
-        <version>0.4.0</version>
-        <classifier>javadoc</classifier>
-      </dependency>
-      <dependency>
-        <groupId>com.tictactec</groupId>
-        <artifactId>ta-lib</artifactId>
-        <version>0.4.0</version>
-        <classifier>sources</classifier>
-      </dependency>
+<!--      <dependency>-->
+<!--        <groupId>com.tictactec</groupId>-->
+<!--        <artifactId>ta-lib</artifactId>-->
+<!--        <version>0.4.0</version>-->
+<!--        <classifier>javadoc</classifier>-->
+<!--      </dependency>-->
+<!--      <dependency>-->
+<!--        <groupId>com.tictactec</groupId>-->
+<!--        <artifactId>ta-lib</artifactId>-->
+<!--        <version>0.4.0</version>-->
+<!--        <classifier>sources</classifier>-->
+<!--      </dependency>-->
       <dependency>
         <groupId>joinery</groupId>
         <artifactId>joinery-dataframe</artifactId>

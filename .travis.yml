@@ -1,0 +1,7 @@
+language: java
+jdk:
+  - oraclejdk8
+before_install:
+  openssl aes-256-cbc -K $encrypted_1f529b35453a_key -iv $encrypted_1f529b35453a_iv -in deploy/travis/settings-security.xml.enc -out deploy/travis/settings-security.xml -d
+script:
+  - mvn -U --settings deploy/travis/settings.xml -Dsettings.security=deploy/travis/security-settings.xml deploy clean package

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <localRepository>${user.home}/.m2/repository</localRepository>
+
+  <pluginGroups>
+    <pluginGroup>org.codehaus.cargo</pluginGroup>
+    <pluginGroup>org.mortbay.jetty</pluginGroup>
+  </pluginGroups>
+
+  <servers>
+                <server>
+                        <id>yuanpin</id>
+                        <username>dev</username>
+                        <password>{8dDyhDi+CCcHhZ0RcU5BNVPW2VoT6Qfm3YWm3ouC9+uhJW2918sb7AEaTHRGsjVa}</password>
+                </server>
+                <server>
+                        <id>yuanpin-releases</id>
+                        <username>deployment</username>
+                        <password>{YwXdMZPMt5MHTSTQQSxliTtDcVV+p7aYSJePC/2lapkm6hYu27ZuSTwxbFjsWezx}</password>
+                </server>
+                <server>
+                        <id>yuanpin-snapshots</id>
+                        <username>snap_deploy</username>
+                        <password>{GI84SrBmE7UHaZFtUxBi1ml+QsNL1AD1xgvK6DXe+45XIlkunGn5rxwK06qDUjbJ}</password>
+                </server>
+  </servers>
+
+  <mirrors>
+    <mirror>
+      <id>yuanpin</id>
+      <mirrorOf>*</mirrorOf>
+      <name>YuanPin Nexus Repository</name>
+      <url>http://repo.sqmall-inc.com:8081/repository/public</url>
+    </mirror>
+  </mirrors>
+
+  <profiles>
+    <profile>
+      <id>yuanpin</id>
+      <!--Enable snapshots for the built in central repo to direct -->
+      <!--all requests to nexus via the mirror -->
+            <properties>
+                    <maven.test.skip>true</maven.test.skip>
+            </properties>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <!--make the profile active all the time -->
+    <activeProfile>yuanpin</activeProfile>
+  </activeProfiles>
+
+</settings>

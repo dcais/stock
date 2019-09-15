@@ -1,5 +1,9 @@
 language: java
 dist: trusty
+cache:
+  directories:
+   - /home/travis/.m2/
+
 jdk:
 - oraclejdk8
 services:

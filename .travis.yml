@@ -11,7 +11,7 @@ before_install:
 
 install:
 - ls -al && ls -al deploy/travis
-- mvn -U --settings deploy/travis/settings.xml -Dmaven.javadoc.skip=true -Dsettings.security=deploy/travis/security-settings.xml
+- mvn -U --settings deploy/travis/settings.xml -Dmaven.javadoc.skip=true -Dsettings.security=deploy/travis/settings-security.xml
   -Dmaven.test.skip=true -B -V install
 script:
 - mvn -U --settings deploy/travis/settings.xml  -Dsettings.security=deploy/travis/security-settings.xml

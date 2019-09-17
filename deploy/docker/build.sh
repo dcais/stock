@@ -1,15 +1,9 @@
 #!/bin/bash
 cd `dirname $0`
-DOCKER_BUILD_PATH=`pwd`;
+source ./common.sh
 
-cd ../..
-mvn -U clean package
+PROJ_HOME=../../
 
-JAR_FILE=$(ls -al target/ | grep 'stock.*\.jar$'  | awk '{print $9}')
-STOCK_VER=$(ls -al target/ | grep 'stock.*\.jar$'  | awk '{print $9}' | sed 's/stock-//g' | sed 's/\.jar//g')
+cd ${PROJ_HOME}
 
-cp ./target/${JAR_FILE} ./deploy/docker/jar
-
-cd ${DOCKER_BUILD_PATH}
-echo "docker build -t dockersai/stock:v${STOCK_VER} --build-arg STOCK_VER=${STOCK_VER} ."
-docker build -t dockersai/stock:v${STOCK_VER} --build-arg STOCK_VER=${STOCK_VER} .
+G_RESULT=0;

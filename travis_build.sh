@@ -23,13 +23,14 @@ echo "docker.jar ver=$JAR_VER" > ${DOCKER_BUILD_PATH}/jar/jar_ver
 
 cd ${DOCKER_BUILD_PATH}
 
-IMAGE_NAME=stock
+IMAGE_NAME=dockersai/stock
 blue "start building docker image $IMAGE_NAME"
 docker build -t $IMAGE_NAME:latest .
-docker push $IMAGE_NAME:latest
 
 if [[ "x${TRAVIS_TAG}" != "x" ]]
 then
   docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG
-  docker push   $IMAGE_NAME:$TRAVIS_TAG
+  docker push $IMAGE_NAME:$TRAVIS_TAG
+else
+  docker push $IMAGE_NAME:latest
 fi

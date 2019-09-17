@@ -21,5 +21,5 @@ install:
 - mvn -U --settings deploy/travis/settings.xml -Dmaven.javadoc.skip=true -Dsettings.security=deploy/travis/settings-security.xml
   -Dmaven.test.skip=true -B -V install
 script:
-- ls -al deploy/travis
+- docker login -u $DOCKER_USERNAME -p $DOCKER_PWD
 - ./travis_build.sh

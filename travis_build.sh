@@ -58,3 +58,10 @@ cd ${DOCKER_BUILD_PATH}
 IMAGE_NAME=stock
 blue "start building docker image $IMAGE_NAME"
 docker build -t $IMAGE_NAME:latest .
+docker push $IMAGE_NAME:latest
+
+if [[ "x${TRAVIS_TAG}" = "x" ]]
+then
+  docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG
+  docker push   $IMAGE_NAME:$TRAVIS_TAG
+fi

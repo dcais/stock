@@ -48,7 +48,7 @@ then
     exit 1
 fi
 
-
+mkdir -p ${DOCKER_BUILD_PATH}/jar
 rm -fr ${DOCKER_BUILD_PATH}/jar/*.jar
 cp ./target/${JAR_FILE} ${DOCKER_BUILD_PATH}/jar/stock.jar
 echo "docker.jar ver=$JAR_VER" > ${DOCKER_BUILD_PATH}/jar/jar_ver

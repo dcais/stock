@@ -1,25 +1,35 @@
 package org.dcais.stock.stock.dao.xdriver.tec;
 
-import com.google.gson.reflect.TypeToken;
+import com.google.common.reflect.TypeToken;
 import com.mysql.cj.xdevapi.Collection;
-import com.mysql.cj.xdevapi.DbDoc;
 import com.mysql.cj.xdevapi.DocResult;
-import lombok.Getter;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.JsonUtil;
 import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexDef;
 import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexInfo;
 import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexInterface;
 import org.dcais.stock.stock.dao.xdriver.common.XCommon;
-import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
-import org.dcais.stock.stock.entity.tec.BaseTec;
-import org.dcais.stock.stock.entity.tec.TecMa;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 @Component
 public abstract class XTecBaseDao<T> extends XCommon {
+
+  private final Class<T> type;
+
+  @SuppressWarnings("unchecked")
+  protected XTecBaseDao() {
+    Type superclass = getClass().getGenericSuperclass();
+    checkArgument(superclass instanceof ParameterizedType,
+      "%s isn't parameterized", superclass);
+    Type runtimeType = ((ParameterizedType) superclass).getActualTypeArguments()[0];
+    type = (Class<T>) TypeToken.of(runtimeType).getRawType();
+  }
 
   @Override
   public CollectionIndexInterface getCollectionIndexInterface() {
@@ -84,7 +94,7 @@ public abstract class XTecBaseDao<T> extends XCommon {
     }
     List<T> results = new LinkedList<>();
     docs.forEach(dbDoc -> {
-      T data = JsonUtil.getGsonObj().fromJson( dbDoc.toString(), new TypeToken<T>(){}.getType());
+      T data = JsonUtil.getGsonObj().fromJson( dbDoc.toString(), this.type);
       results.add(data);
     });
     return results;

@@ -1,4 +1,4 @@
-package org.dcais.stock.stock.biz.tec;
+package org.dcais.stock.stock.biz.tec.impl;
 
 import com.tictactec.ta.lib.CoreAnnotated;
 import com.tictactec.ta.lib.MAType;
@@ -6,6 +6,7 @@ import com.tictactec.ta.lib.MInteger;
 import joinery.DataFrame;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
+import org.dcais.stock.stock.biz.tec.MAService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;

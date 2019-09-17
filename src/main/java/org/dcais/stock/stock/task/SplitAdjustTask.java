@@ -37,7 +37,7 @@ public class SplitAdjustTask {
           }finally {
             long count = latch.getCount();
             latch.countDown();
-            log.debug("SplitAdjustTask [latch count]" + count + "[tsCode]" + basic.getTsCode());
+            log.debug("SplitAdjustTask done [latch count]" + count + "[tsCode]" + basic.getTsCode());
           }
         }
       });

@@ -26,5 +26,6 @@ public interface BasicService {
 
   Basic getBySymbol(String symbol);
 
+  Basic getByTsCode(String tsCode);
   List<Basic> getAllList();
 }

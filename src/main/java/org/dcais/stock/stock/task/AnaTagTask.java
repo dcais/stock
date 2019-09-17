@@ -1,10 +1,8 @@
 package org.dcais.stock.stock.task;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dcais.stock.stock.biz.ana.AnaTagService;
 import org.dcais.stock.stock.biz.basic.BasicService;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
-import org.dcais.stock.stock.biz.tec.MAService;
-import org.dcais.stock.stock.dao.xdriver.meta.XMetaCollDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,25 +10,19 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class SMATask {
+public class AnaTagTask {
   @Autowired
   private BasicService basicService;
   @Autowired
+  private AnaTagService anaTagService;
+  @Autowired
   private ThreadPoolExecutor threadPoolExecutor;
-  @Autowired
-  private MAService maService;
-  @Autowired
-  private XMetaCollDao xMetaCollDao;
 
   public void startCalc(){
-    log.info("SMATask Start");
-
-    List<Double> tmps = (List<Double>) xMetaCollDao.get("SmaPeriods");
-    List<Integer> periods = tmps.stream().map(Double::intValue).collect(Collectors.toList());
+    log.info("AnaTagTask Start");
 
     List<Basic> list = basicService.getAllList();
     log.info(String.format("SplitAdjustTask count %d", list.size()));
@@ -39,14 +31,14 @@ public class SMATask {
       threadPoolExecutor.execute(new Runnable() {
         @Override
         public void run() {
-          log.info( "SMATask on [tsCode]"+ basic.getTsCode());
+          log.info( "AnaTagTask on [tsCode]"+ basic.getTsCode());
           try{
-            maService.calcSMA(basic.getTsCode(),periods);
+            anaTagService.ana(basic.getTsCode());
           }catch (Exception e){
           }finally {
             long count = latch.getCount();
             latch.countDown();
-            log.debug("SMATask done [latch count]" + count + "[tsCode]" + basic.getTsCode());
+            log.debug("AnaTagTask done [latch count]" + count + "[tsCode]" + basic.getTsCode());
           }
         }
       });
@@ -57,7 +49,6 @@ public class SMATask {
     } catch (InterruptedException e) {
       log.error("",e);
     }
-    log.info("SMATask Done");
+    log.info("AnaTagTask Done");
   }
-
 }

@@ -90,6 +90,18 @@ public class BasicServiceImpl extends BaseServiceImpl implements BasicService {
   }
 
   @Override
+  public Basic getByTsCode(String tsCode) {
+    Map<String, Object> param = new HashMap<>();
+    param.put("isDeleted", "N");
+    param.put("tsCode", tsCode);
+    List<Basic> tmps = this.select(param);
+    if (ListUtil.isBlank(tmps)) {
+      return null;
+    }
+    return tmps.get(0);
+  }
+
+  @Override
   public Basic getBySymbol(String symbol) {
     Map<String, Object> param = new HashMap<>();
     param.put("isDeleted", "N");

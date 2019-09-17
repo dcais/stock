@@ -35,7 +35,7 @@ function yellow(){
 
 DOCKER_BUILD_PATH=deploy/docker
 
-mvn -U --settings deploy/travis/settings.xml  -Dsettings.security=deploy/travis/security-settings.xml -Dmaven.test.skip=true clean package
+mvn -U --settings deploy/travis/settings.xml -Dmaven.javadoc.skip=true -Dsettings.security=deploy/travis/settings-security.xml -Dmaven.test.skip=true clean package
 
 JAR_FILE=$(ls -al target/ | grep 'stock.*\.jar$'  | awk '{print $9}')
 JAR_VER=$(ls -al target/ | grep 'stock.*\.jar$'  | awk '{print $9}' | sed 's/stock-//g' | sed 's/\.jar//g')

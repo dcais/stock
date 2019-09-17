@@ -1,37 +1,5 @@
 #!/bin/bash
-sqEcho(){
-   echo -e $@
-}
-## blue to echo
-function blue(){
-    sqEcho "\033[34m $@\033[0m"
-}
-
-## green to echo
-function green(){
-    sqEcho "\033[32m $@\033[0m"
-}
-
-## Error to warning with blink
-function bred(){
-    sqEcho "\033[31m\033[01m\033[05m $@\033[0m"
-}
-
-## Error to warning with blink
-function byellow(){
-    sqEcho "\033[33m\033[01m\033[05m $@\033[0m"
-}
-
-
-## Error
-function red(){
-    sqEcho "\033[31m\033[01m $@\033[0m"
-}
-
-## warning
-function yellow(){
-    sqEcho "\033[33m\033[01m $@\033[0m"
-}
+source deploy/bin/common.sh
 
 DOCKER_BUILD_PATH=deploy/docker
 
@@ -60,7 +28,7 @@ blue "start building docker image $IMAGE_NAME"
 docker build -t $IMAGE_NAME:latest .
 docker push $IMAGE_NAME:latest
 
-if [[ "x${TRAVIS_TAG}" = "x" ]]
+if [[ "x${TRAVIS_TAG}" != "x" ]]
 then
   docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TRAVIS_TAG
   docker push   $IMAGE_NAME:$TRAVIS_TAG

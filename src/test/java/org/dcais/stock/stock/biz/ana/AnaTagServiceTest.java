@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("prd")
 @SpringBootTest
 @Slf4j
 @Test

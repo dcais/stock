@@ -73,10 +73,15 @@ public class AnaTagServiceImpl implements AnaTagService {
     anaResult.put(AnaCons.ANA_CONS_INDUSTRY,stock.getIndustry());
     anaResult.put(AnaCons.ANA_CONS_EXCHANGE,stock.getExchange());
 
+    anaResult.put(AnaCons.ANA_CONS_OPEN, df.get(df.length()-1,"open"));
+    anaResult.put(AnaCons.ANA_CONS_HIGH, df.get(df.length()-1,"high"));
+    anaResult.put(AnaCons.ANA_CONS_LOW, df.get(df.length()-1,"low"));
+    anaResult.put(AnaCons.ANA_CONS_CLOSE, df.get(df.length()-1,"close"));
 
     for(String period:smaTecPeriods){
       String key = AnaCons.ANA_CONS_SMA_TREND_PRE + period;
       String tecName = "sma"+ period;
+      anaResult.put(AnaCons.ANA_CONS_SMA_PRE+period, df.get(df.length()-1,tecName));
       Boolean res = isBigDecimalOver(df,df.length()-1,tecName,df.length()-2,tecName);
       anaResult.put(key,getMark(res));
     }

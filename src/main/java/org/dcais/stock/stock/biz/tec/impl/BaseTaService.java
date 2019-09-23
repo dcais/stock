@@ -1,12 +1,17 @@
 package org.dcais.stock.stock.biz.tec.impl;
 
 import joinery.DataFrame;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.result.Result;
+import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
+import org.dcais.stock.stock.dao.xdriver.tec.XTecBaseDao;
 import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
+import org.dcais.stock.stock.entity.tec.TecMa;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +25,9 @@ public class BaseTaService {
   private SplitAdjustService splitAdjustService;
   @Autowired
   private XSMADao xsmaDao;
+  @Getter
+  @Value("${stock.batch-insert-size:1000}")
+  private Integer batchInsertSize;
 
   List<BigDecimal> convertOutRealToList(double[] real, int begIdx, int outNBElement) {
     List<BigDecimal> list = new ArrayList<>(outNBElement + begIdx);
@@ -61,5 +69,11 @@ public class BaseTaService {
       df.append(obj);
     });
     return df;
+  }
+  public void save (List<TecMa> mas, XTecBaseDao xTecBaseDao){
+    List<List<TecMa>> masSubs = ListUtil.getSubDepartList(mas,getBatchInsertSize());
+    for(List<TecMa> sub : masSubs){
+      xTecBaseDao.insertList(sub);
+    }
   }
 }

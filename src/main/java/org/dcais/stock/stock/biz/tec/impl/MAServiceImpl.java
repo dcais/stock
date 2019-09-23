@@ -97,7 +97,7 @@ public class MAServiceImpl extends BaseTaService implements MAService {
         tecMa.setValue((BigDecimal) df.get(row,colName));
         mas.add(tecMa);
       }
-      xTecBaseDao.insertList(mas);
+      this.save(mas,xTecBaseDao);
     });
   }
 

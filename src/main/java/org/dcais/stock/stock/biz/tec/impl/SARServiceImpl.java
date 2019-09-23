@@ -108,7 +108,7 @@ public class SARServiceImpl extends BaseTaService implements SARService {
       tecMa.setValue((BigDecimal) df.get(row,colName));
       mas.add(tecMa);
     }
-    xTecBaseDao.insertList(mas);
+    this.save(mas,xTecBaseDao);
   }
 
 }

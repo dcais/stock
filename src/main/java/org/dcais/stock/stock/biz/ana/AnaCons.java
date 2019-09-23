@@ -20,4 +20,7 @@ public interface AnaCons {
   String ANA_CONS_OPEN="open";
   String ANA_CONS_HIGH="high";
   String ANA_CONS_LOW="low";
+  String ANA_CONS_SAR="sar";
+
+  String ANA_CONS_SAR_SIGNAL="sarSignal";
 }

@@ -7,9 +7,11 @@ import joinery.DataFrame;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.biz.tec.MAService;
+import org.dcais.stock.stock.biz.tec.SARService;
 import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
 import org.dcais.stock.stock.dao.xdriver.tec.XTecBaseDao;
+import org.dcais.stock.stock.dao.xdriver.tec.XTecSARDao;
 import org.dcais.stock.stock.entity.tec.TecMa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,11 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class MAServiceImpl extends BaseTaService implements MAService {
+public class SARServiceImpl extends BaseTaService implements SARService {
   @Autowired
   private SplitAdjustService splitAdjustService;
   @Autowired
-  private XSMADao xsmaDao;
+  private XTecSARDao xTecSARDao;
 
   public void calc(DataFrame df, MAType maType,Integer period){
 
@@ -56,24 +58,17 @@ public class MAServiceImpl extends BaseTaService implements MAService {
 
     df.add(getTecName(maType,period),ma);
   }
+  public String getTecName(){
+    return "sar";
+  }
 
   protected String getTecName(MAType maType, Integer period){
     return maType.name() + period;
   }
 
-  protected void calc(String tsCode, MAType maType, List<Integer> periods){
+  public void calc(String tsCode){
     XTecBaseDao xTecBaseDao;
-    if(ListUtil.isBlank(periods)){
-      String errMsg = "periods is empty";
-      log.error(errMsg);
-      throw  new RuntimeException(errMsg);
-    }
-    if(maType == MAType.Sma){
-       xTecBaseDao = xsmaDao;
-    }else{
-      log.error("Unknown MAType"+maType.name());
-      throw new RuntimeException("Unknown MAType "+maType.name());
-    }
+    xTecBaseDao = xTecSARDao;
 
     DataFrame df =  getDataFrame(tsCode);
     if(df == null){
@@ -81,28 +76,39 @@ public class MAServiceImpl extends BaseTaService implements MAService {
       return;
     }
 
-    periods.forEach( period ->{
-      calc( df,maType,period);
-    });
+    List<BigDecimal> highs =  df.col("high");
+    List<BigDecimal> lows =  df.col("low");
+    double[] arrHigh = new double[highs.size()];
+    double[] arrLow = new double[lows.size()];
+    for(int i = 0 ; i < highs.size() ; i++ ){
+      arrHigh[i] = highs.get(i).doubleValue();
+    }
+    for(int i = 0 ; i < lows.size() ; i++ ){
+      arrLow[i] = lows.get(i).doubleValue();
+    }
+
+    MInteger outBegIdx = new MInteger();
+    MInteger outNBElement = new MInteger();
+    double[] outReal = new double[arrHigh.length];
+
+    CoreAnnotated coreAnnotated = new CoreAnnotated();
+    coreAnnotated.sar(0, arrHigh.length-1, arrHigh,arrLow , 0.02d, 0.2d, outBegIdx,outNBElement, outReal );
+
+    List<BigDecimal> sars = convertOutRealToList(outReal,outBegIdx.value,outNBElement.value);
+    df.add(getTecName(),sars);
 
     xTecBaseDao.remove(tsCode);
-    periods.forEach( period ->{
-      String colName = getTecName(maType,period);
-      List<TecMa> mas = new LinkedList<>();
-      for (int row=0 ; row< df.length() ; row ++ ){
-        TecMa tecMa = new TecMa();
-        tecMa.setTsCode((String) df.get(row,"tsCode"));
-        tecMa.setTecName(colName);
-        tecMa.setTradeDate((Date) df.get(row,"tradeDate"));
-        tecMa.setValue((BigDecimal) df.get(row,colName));
-        mas.add(tecMa);
-      }
-      xTecBaseDao.insertList(mas);
-    });
+    String colName = getTecName();
+    List<TecMa> mas = new LinkedList<>();
+    for (int row=0 ; row< df.length() ; row ++ ){
+      TecMa tecMa = new TecMa();
+      tecMa.setTsCode((String) df.get(row,"tsCode"));
+      tecMa.setTecName(colName);
+      tecMa.setTradeDate((Date) df.get(row,"tradeDate"));
+      tecMa.setValue((BigDecimal) df.get(row,colName));
+      mas.add(tecMa);
+    }
+    xTecBaseDao.insertList(mas);
   }
 
-  @Override
-  public void calcSMA(String tsCode, List<Integer> periods) {
-    this.calc(tsCode,MAType.Sma, periods);
-  }
 }

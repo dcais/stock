@@ -30,4 +30,11 @@ public class TecController {
     smaTask.startCalc();
     return Result.wrapSuccessfulResult("OK");
   }
+
+  @RequestMapping(value = "/sar", method = RequestMethod.GET)
+  @ResponseBody
+  public Result sar(){
+    smaTask.startCalc();
+    return Result.wrapSuccessfulResult("OK");
+  }
 }

@@ -1,7 +1,6 @@
-package org.dcais.stock.stock.biz.ana;
+package org.dcais.stock.stock.biz.tec;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.tec.MAService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,14 +12,13 @@ import java.util.Arrays;
 @ActiveProfiles("dev")
 @SpringBootTest
 @Slf4j
-@Test
-public class AnaTagServiceTest extends AbstractTestNGSpringContextTests {
+public class SARServiceTest extends AbstractTestNGSpringContextTests {
   @Autowired
-  private AnaTagService anaTagService;
+  private SARService sarService;
 
   @Test
   public void test(){
-    anaTagService.ana("000001.SZ");
+    sarService.calc("000001.SZ");
 
   }
 

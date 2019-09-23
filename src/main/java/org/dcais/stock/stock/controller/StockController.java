@@ -8,6 +8,7 @@ import org.dcais.stock.stock.biz.info.DailyService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.task.AnaTagTask;
+import org.dcais.stock.stock.task.SARTask;
 import org.dcais.stock.stock.task.SMATask;
 import org.dcais.stock.stock.task.SplitAdjustTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class StockController {
   private SplitAdjustTask splitAdjustTask;
   @Autowired
   private SMATask smaTask;
+  @Autowired
+  private SARTask sarTask;
   @Autowired
   private AnaTagTask anaTagTask;
 
@@ -62,6 +65,7 @@ public class StockController {
     dailyService.syncAll(CmnConstants.SYNC_MODE_DATE);
     adjFactorService.syncAll(CmnConstants.SYNC_MODE_DATE);
     splitAdjustTask.startCalc();
+    sarTask.startCalc();
     smaTask.startCalc();
     anaTagTask.startCalc();
 

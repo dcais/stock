@@ -11,6 +11,7 @@ import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.StringUtil;
 import org.dcais.stock.stock.dao.xdriver.ana.XAnaTagDao;
 import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
+import org.dcais.stock.stock.dao.xdriver.tec.XTecSARDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
 import org.dcais.stock.stock.entity.tec.BaseTec;
@@ -32,6 +33,8 @@ public class AnaTagServiceImpl implements AnaTagService {
   @Autowired
   private XSMADao xsmaDao;
   @Autowired
+  private XTecSARDao xTecSARDao;
+  @Autowired
   private XAnaTagDao xAnaTagDao;
 
   String getMark(Boolean b){
@@ -46,13 +49,13 @@ public class AnaTagServiceImpl implements AnaTagService {
     Basic stock = basicService.getByTsCode(tsCode);
     Calendar ca = Calendar.getInstance();
     ca.setTime(DateUtils.getStartTimeDate(new Date()));
-    ca.add(Calendar.YEAR,-1);
+    ca.add(Calendar.MONTH,-3);
     Date gteDate = ca.getTime();
     DataFrame df = this.getDataFrame(tsCode,gteDate);
     List<TecMa> list = null;
     List<BigDecimal> ma = null;
 
-    String[] smaTecPeriods= {"8","17","25","99","145","318","453"};
+    String[] smaTecPeriods= {"8","17","25","99"};
 
     for(String period:smaTecPeriods){
       String tecName = "sma"+period;
@@ -60,6 +63,11 @@ public class AnaTagServiceImpl implements AnaTagService {
       ma = list.stream().map(BaseTec::getValue).collect(Collectors.toList());
       df.add(tecName,ma);
     }
+
+    list = xTecSARDao.getFromDate(tsCode,"sar", gteDate);
+    ma = list.stream().map(BaseTec::getValue).collect(Collectors.toList());
+    df.add("sar",ma);
+
 
     Date tradeDate = (Date) df.get(df.length()-1,"tradeDate");
 
@@ -77,6 +85,20 @@ public class AnaTagServiceImpl implements AnaTagService {
     anaResult.put(AnaCons.ANA_CONS_HIGH, df.get(df.length()-1,"high"));
     anaResult.put(AnaCons.ANA_CONS_LOW, df.get(df.length()-1,"low"));
     anaResult.put(AnaCons.ANA_CONS_CLOSE, df.get(df.length()-1,"close"));
+    anaResult.put(AnaCons.ANA_CONS_SAR, df.get(df.length()-1,"sar"));
+
+    Boolean rSigToday = isBigDecimalOver(df,df.length()-1,"sar", df.length()-1, "close");
+    Boolean rSigYestorday = isBigDecimalOver(df,df.length()-2,"sar", df.length()-2, "close");
+
+    if(rSigToday && rSigYestorday){
+      anaResult.put(AnaCons.ANA_CONS_SAR_SIGNAL, "S");
+    }else if ( !rSigToday && !rSigYestorday) {
+      anaResult.put(AnaCons.ANA_CONS_SAR_SIGNAL, "B");
+    }else if ( !rSigYestorday && rSigToday ) {
+      anaResult.put(AnaCons.ANA_CONS_SAR_SIGNAL, "BS");
+    }else if( rSigYestorday && !rSigToday ) {
+      anaResult.put(AnaCons.ANA_CONS_SAR_SIGNAL, "SB");
+    }
 
     for(String period:smaTecPeriods){
       String key = AnaCons.ANA_CONS_SMA_TREND_PRE + period;

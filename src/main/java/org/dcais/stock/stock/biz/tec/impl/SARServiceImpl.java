@@ -110,5 +110,8 @@ public class SARServiceImpl extends BaseTaService implements SARService {
     }
     this.save(mas,xTecBaseDao);
   }
-
+  @Override
+  public void removeAll() {
+    xTecSARDao.removeAll();
+  }
 }

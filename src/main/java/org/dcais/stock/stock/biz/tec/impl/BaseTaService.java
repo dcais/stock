@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.ListUtil;
-import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
 import org.dcais.stock.stock.dao.xdriver.tec.XTecBaseDao;
 import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
 import org.dcais.stock.stock.entity.tec.TecMa;
@@ -20,11 +19,9 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class BaseTaService {
+public abstract class BaseTaService {
   @Autowired
   private SplitAdjustService splitAdjustService;
-  @Autowired
-  private XSMADao xsmaDao;
   @Getter
   @Value("${stock.batch-insert-size:1000}")
   private Integer batchInsertSize;
@@ -76,4 +73,5 @@ public class BaseTaService {
       xTecBaseDao.insertList(sub);
     }
   }
+
 }

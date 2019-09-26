@@ -80,6 +80,10 @@ public abstract class XTecBaseDao<T> extends XCommon {
     Collection col = getCollection();
     col.remove("tsCode=:tsCode").bind("tsCode",tsCode).execute();
   }
+  public void removeAll(){
+    Collection col = getCollection();
+    col.remove("true").execute();
+  }
 
   public List<T> getFromDate(String tsCode, String key, Date gteDate){
     String strDate = DateUtils.formatDate(gteDate,DateUtils.ISO_DATE_TIME);

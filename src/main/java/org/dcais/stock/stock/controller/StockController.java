@@ -65,8 +65,34 @@ public class StockController {
     dailyService.syncAll(CmnConstants.SYNC_MODE_DATE);
     adjFactorService.syncAll(CmnConstants.SYNC_MODE_DATE);
     splitAdjustTask.startCalc();
-    sarTask.startCalc();
-    smaTask.startCalc();
+
+    Thread tSar= new Thread(new Runnable() {
+      @Override
+      public void run() {
+        sarTask.startCalc();
+      }
+    },"thd-sar");
+    tSar.start();
+
+    Thread tSma = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        smaTask.startCalc();
+      }
+    });
+    tSma.start();
+
+    try {
+      tSar.join();
+    } catch (InterruptedException e) {
+      log.error("",e);
+    }
+    try {
+      tSma.join();
+    } catch (InterruptedException e) {
+      log.error("",e);
+    }
+
     anaTagTask.startCalc();
 
     return Result.wrapSuccessfulResult("OK");

@@ -105,4 +105,9 @@ public class MAServiceImpl extends BaseTaService implements MAService {
   public void calcSMA(String tsCode, List<Integer> periods) {
     this.calc(tsCode,MAType.Sma, periods);
   }
+
+  @Override
+  public void removeAll() {
+    xsmaDao.removeAll();
+  }
 }

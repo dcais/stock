@@ -7,8 +7,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-
 @ActiveProfiles("dev")
 @SpringBootTest
 @Slf4j

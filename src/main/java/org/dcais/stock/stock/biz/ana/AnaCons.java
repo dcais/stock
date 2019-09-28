@@ -14,8 +14,9 @@ public interface AnaCons {
 
   String ANA_CONS_SMA_GLOD_CROSS_PRE="smaGoldCross_";
   String ANA_CONS_SMA_DEAD_CROSS_PRE="smaDeadCross_";
+  String ANA_CONS_SMA_SL_PRE="smaSL_";
 
-  String ANA_CONS_SMA_PRE="sam_";
+  String ANA_CONS_SMA_PRE="sma_";
   String ANA_CONS_CLOSE="close";
   String ANA_CONS_OPEN="open";
   String ANA_CONS_HIGH="high";

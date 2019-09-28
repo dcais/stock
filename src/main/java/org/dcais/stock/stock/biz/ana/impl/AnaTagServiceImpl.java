@@ -55,7 +55,7 @@ public class AnaTagServiceImpl implements AnaTagService {
     List<TecMa> list = null;
     List<BigDecimal> ma = null;
 
-    String[] smaTecPeriods= {"8","17","25","99"};
+    String[] smaTecPeriods= {"8","17","25","99","145"};
 
     for(String period:smaTecPeriods){
       String tecName = "sma"+period;
@@ -108,7 +108,7 @@ public class AnaTagServiceImpl implements AnaTagService {
       anaResult.put(key,getMark(res));
     }
 
-    String[][] crossPeriods = {{"8","17"},{"8","25"},{"17","25"},{"25","99"}};
+    String[][] crossPeriods = {{"8","17"},{"8","25"},{"17","25"},{"25","99"},{"99","145"}};
 
     for(String[] periods: crossPeriods){
       String shortP = periods[0];
@@ -118,6 +118,12 @@ public class AnaTagServiceImpl implements AnaTagService {
 
       Boolean isShortOverLongPre =  isBigDecimalOver(df, df.length()-2 , tecNameShortP,df.length()-2, tecNameLongP);
       Boolean isShortOverLong =  isBigDecimalOver(df, df.length()-1 , tecNameShortP,df.length()-1, tecNameLongP );
+
+      if(isShortOverLong){
+        anaResult.put(AnaCons.ANA_CONS_SMA_SL_PRE+shortP+"_"+longP,"OVER");
+      }else{
+        anaResult.put(AnaCons.ANA_CONS_SMA_SL_PRE+shortP+"_"+longP,"UNDER");
+      }
 
       anaResult.put(AnaCons.ANA_CONS_SMA_OVER_PRE+shortP+"_"+longP , getMark(isShortOverLong));
 

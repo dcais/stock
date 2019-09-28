@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.result.Result;
+import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.dao.xdriver.tec.XTecBaseDao;
 import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
@@ -14,8 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -25,6 +26,8 @@ public abstract class BaseTaService {
   @Getter
   @Value("${stock.batch-insert-size:1000}")
   private Integer batchInsertSize;
+  @Autowired
+  protected Date tecGteDate;
 
   List<BigDecimal> convertOutRealToList(double[] real, int begIdx, int outNBElement) {
     List<BigDecimal> list = new ArrayList<>(outNBElement + begIdx);
@@ -39,14 +42,22 @@ public abstract class BaseTaService {
     return list;
   }
 
-  public DataFrame getDataFrame(String tsCode) {
-    Result<List<SplitAdjustedDaily>> result  = splitAdjustService.getSplitAdjustDailyList(tsCode, null);
+  public DataFrame getDataFrame(String tsCode, Date gteDate) {
+    Result<List<SplitAdjustedDaily>> result  = splitAdjustService.getSplitAdjustDailyList(tsCode, gteDate);
     if(!result.isSuccess()){
       log.error(result.getErrorMsg());
       return null;
     }
     DataFrame df = convToDF(result.getData());
-    return  df;
+
+    List<Date> tradeDates = df.col("tradeDate");
+    List<String> strTradeDates = tradeDates.stream().map(t-> DateUtils.formatDate(t,DateUtils.YMD)).collect(Collectors.toList());
+    df.add("strTradeDate",strTradeDates);
+
+    Set columns = df.columns();
+
+    DataFrame dfr = df.reindex( columns.size()-1, true);
+    return  dfr;
   }
 
   public DataFrame convToDF(List<SplitAdjustedDaily> datas){
@@ -67,11 +78,34 @@ public abstract class BaseTaService {
     });
     return df;
   }
+
+  public Map<String,Integer> getDataframeColumsMap(DataFrame df){
+    Set<String> colums =  df.columns();
+    Map<String,Integer> map = new HashMap<>();
+    Integer i = 0;
+    for( String columnName :colums){
+      map.put(columnName,i);
+      i++;
+    }
+    return map;
+  }
+
   public void save (List<TecMa> mas, XTecBaseDao xTecBaseDao){
+    if(ListUtil.isBlank(mas)){
+      return;
+    }
     List<List<TecMa>> masSubs = ListUtil.getSubDepartList(mas,getBatchInsertSize());
     for(List<TecMa> sub : masSubs){
       xTecBaseDao.insertList(sub);
     }
+  }
+
+  public Date getCheckEqualgtDate(){
+    Date now = new Date();
+    Calendar ca = Calendar.getInstance();
+    ca.setTime(now);
+    ca.add(Calendar.MONTH,-2);
+    return ca.getTime();
   }
 
 }

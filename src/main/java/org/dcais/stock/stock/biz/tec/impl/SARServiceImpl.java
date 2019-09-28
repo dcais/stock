@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.biz.tec.MAService;
 import org.dcais.stock.stock.biz.tec.SARService;
+import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
 import org.dcais.stock.stock.dao.xdriver.tec.XTecBaseDao;
@@ -70,7 +71,7 @@ public class SARServiceImpl extends BaseTaService implements SARService {
     XTecBaseDao xTecBaseDao;
     xTecBaseDao = xTecSARDao;
 
-    DataFrame df =  getDataFrame(tsCode);
+    DataFrame df =  getDataFrame(tsCode,tecGteDate);
     if(df == null){
       log.error("cannot get dataFrame. [tsCode]"+ tsCode);
       return;
@@ -97,15 +98,41 @@ public class SARServiceImpl extends BaseTaService implements SARService {
     List<BigDecimal> sars = convertOutRealToList(outReal,outBegIdx.value,outNBElement.value);
     df.add(getTecName(),sars);
 
-    xTecBaseDao.remove(tsCode);
+    List<TecMa> list = xTecBaseDao.getFromDate(tsCode,getTecName() ,getCheckEqualgtDate());
+    TecMa lastInDb = null;
+    if(ListUtil.isNotBlank(list)){
+      lastInDb = list.get(list.size()-1);
+    }
+
+    DataFrame dfToBeSave = df;
+    if(lastInDb != null ){
+
+      String strLastInDbTradeDate = DateUtils.formatDate(lastInDb.getTradeDate(),DateUtils.YMD);
+      BigDecimal tecValue = (BigDecimal) df.get(strLastInDbTradeDate,getTecName());
+
+      if(tecValue.setScale(2,BigDecimal.ROUND_FLOOR).compareTo(lastInDb.getValue().setScale(2,BigDecimal.ROUND_FLOOR)) != 0 ){
+        xTecBaseDao.remove(tsCode);
+      } else {
+        Date gtSlice = lastInDb.getTradeDate();
+        dfToBeSave= df.select((DataFrame.Predicate<Object>) value -> {
+          Date tradeDate = (Date) value.get(1);
+          return tradeDate.compareTo(gtSlice) > 0;
+        });
+      }
+    }else {
+      xTecBaseDao.remove(tsCode);
+    }
+
     String colName = getTecName();
     List<TecMa> mas = new LinkedList<>();
-    for (int row=0 ; row< df.length() ; row ++ ){
+
+    dfToBeSave = dfToBeSave.resetIndex();
+    for (int row=0 ; row< dfToBeSave.length() ; row ++ ){
       TecMa tecMa = new TecMa();
-      tecMa.setTsCode((String) df.get(row,"tsCode"));
+      tecMa.setTsCode((String) dfToBeSave.get(row,"tsCode"));
       tecMa.setTecName(colName);
-      tecMa.setTradeDate((Date) df.get(row,"tradeDate"));
-      tecMa.setValue((BigDecimal) df.get(row,colName));
+      tecMa.setTradeDate((Date) dfToBeSave.get(row,"tradeDate"));
+      tecMa.setValue((BigDecimal) dfToBeSave.get(row,colName));
       mas.add(tecMa);
     }
     this.save(mas,xTecBaseDao);

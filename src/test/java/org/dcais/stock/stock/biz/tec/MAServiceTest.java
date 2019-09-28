@@ -19,7 +19,7 @@ public class MAServiceTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void test() throws Exception {
-    maServiceImpl.calcSMA("000001.SZ", Arrays.asList(8));
+    maServiceImpl.calcSMA("000001.SZ", Arrays.asList(8, 17, 25, 99, 145, 318, 453, 732, 890));
   }
 
 

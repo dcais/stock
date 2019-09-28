@@ -39,22 +39,23 @@ public abstract class XTecBaseDao<T> extends XCommon {
         List<CollectionIndexInfo> collectionIndexInfos = new ArrayList<>();
 
         CollectionIndexInfo collectionIndexInfo = new CollectionIndexInfo();
-//        collectionIndexInfo.setIndexName("idx_ts_code");
-//        collectionIndexInfo.setFields(new ArrayList<>());
-//        collectionIndexInfo.getFields().add(new CollectionIndexDef("$.tsCode", "TEXT(16)"));
-//        collectionIndexInfos.add(collectionIndexInfo);
-//
-//        collectionIndexInfo = new CollectionIndexInfo();
-//        collectionIndexInfo.setIndexName("idx_trade_date");
-//        collectionIndexInfo.setFields(new ArrayList<>());
-//        collectionIndexInfo.getFields().add(new CollectionIndexDef("$.tradeDate", "TEXT(40)"));
-//        collectionIndexInfos.add(collectionIndexInfo);
-//
-//        collectionIndexInfo = new CollectionIndexInfo();
-//        collectionIndexInfo.setIndexName("idx_tecName");
-//        collectionIndexInfo.setFields(new ArrayList<>());
-//        collectionIndexInfo.getFields().add(new CollectionIndexDef("$.tecName", "TEXT(40)"));
-//        collectionIndexInfos.add(collectionIndexInfo);
+
+        collectionIndexInfo.setIndexName("idx_ts_code");
+        collectionIndexInfo.setFields(new ArrayList<>());
+        collectionIndexInfo.getFields().add(new CollectionIndexDef("$.tsCode", "TEXT(16)"));
+        collectionIndexInfos.add(collectionIndexInfo);
+
+        collectionIndexInfo = new CollectionIndexInfo();
+        collectionIndexInfo.setIndexName("idx_trade_date");
+        collectionIndexInfo.setFields(new ArrayList<>());
+        collectionIndexInfo.getFields().add(new CollectionIndexDef("$.tradeDate", "TEXT(40)"));
+        collectionIndexInfos.add(collectionIndexInfo);
+
+        collectionIndexInfo = new CollectionIndexInfo();
+        collectionIndexInfo.setIndexName("idx_tecName");
+        collectionIndexInfo.setFields(new ArrayList<>());
+        collectionIndexInfo.getFields().add(new CollectionIndexDef("$.tecName", "TEXT(40)"));
+        collectionIndexInfos.add(collectionIndexInfo);
 
         collectionIndexInfo = new CollectionIndexInfo();
         collectionIndexInfo.setIndexName("idx_tscode_tecname_tradedate");

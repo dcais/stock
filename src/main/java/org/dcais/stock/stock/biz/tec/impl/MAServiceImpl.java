@@ -13,11 +13,13 @@ import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
 import org.dcais.stock.stock.dao.xdriver.tec.XTecBaseDao;
 import org.dcais.stock.stock.entity.tec.TecMa;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 @Slf4j

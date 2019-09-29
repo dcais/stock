@@ -1,5 +1,7 @@
 package org.dcais.stock.stock.biz.ana.impl;
 
+import com.tictactec.ta.lib.CoreAnnotated;
+import com.tictactec.ta.lib.MAType;
 import joinery.DataFrame;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.ana.AnaCons;
@@ -9,6 +11,7 @@ import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.StringUtil;
+import org.dcais.stock.stock.common.utils.TalibUtil;
 import org.dcais.stock.stock.dao.xdriver.ana.XAnaTagDao;
 import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
 import org.dcais.stock.stock.dao.xdriver.tec.XTecSARDao;
@@ -44,6 +47,11 @@ public class AnaTagServiceImpl implements AnaTagService {
     return b ? "Y":"N";
   }
 
+
+  public String[] getSmaPeriods(){
+    return new String[]{"8", "17", "25", "99", "145"};
+  }
+
   @Override
   public void ana(String tsCode){
     Basic stock = basicService.getByTsCode(tsCode);
@@ -55,19 +63,7 @@ public class AnaTagServiceImpl implements AnaTagService {
     List<TecMa> list = null;
     List<BigDecimal> ma = null;
 
-    String[] smaTecPeriods= {"8","17","25","99","145"};
-
-    for(String period:smaTecPeriods){
-      String tecName = "sma"+period;
-      list = xsmaDao.getFromDate(tsCode, tecName,gteDate);
-      ma = list.stream().map(BaseTec::getValue).collect(Collectors.toList());
-      df.add(tecName,ma);
-    }
-
-    list = xTecSARDao.getFromDate(tsCode,"sar", gteDate);
-    ma = list.stream().map(BaseTec::getValue).collect(Collectors.toList());
-    df.add("sar",ma);
-
+    String[] smaTecPeriods= getSmaPeriods();
 
     Date tradeDate = (Date) df.get(df.length()-1,"tradeDate");
 
@@ -102,7 +98,7 @@ public class AnaTagServiceImpl implements AnaTagService {
 
     for(String period:smaTecPeriods){
       String key = AnaCons.ANA_CONS_SMA_TREND_PRE + period;
-      String tecName = "sma"+ period;
+      String tecName = "Sma"+ period;
       anaResult.put(AnaCons.ANA_CONS_SMA_PRE+period, df.get(df.length()-1,tecName));
       Boolean res = isBigDecimalOver(df,df.length()-1,tecName,df.length()-2,tecName);
       anaResult.put(key,getMark(res));
@@ -113,13 +109,14 @@ public class AnaTagServiceImpl implements AnaTagService {
     for(String[] periods: crossPeriods){
       String shortP = periods[0];
       String longP = periods[1];
-      String tecNameShortP = "sma"+shortP;
-      String tecNameLongP = "sma"+longP;
+      String tecNameShortP = "Sma"+shortP;
+      String tecNameLongP = "Sma"+longP;
 
       Boolean isShortOverLongPre =  isBigDecimalOver(df, df.length()-2 , tecNameShortP,df.length()-2, tecNameLongP);
       Boolean isShortOverLong =  isBigDecimalOver(df, df.length()-1 , tecNameShortP,df.length()-1, tecNameLongP );
 
-      if(isShortOverLong){
+      if( isShortOverLong == null){
+      }else if (isShortOverLong){
         anaResult.put(AnaCons.ANA_CONS_SMA_SL_PRE+shortP+"_"+longP,"OVER");
       }else{
         anaResult.put(AnaCons.ANA_CONS_SMA_SL_PRE+shortP+"_"+longP,"UNDER");
@@ -148,12 +145,12 @@ public class AnaTagServiceImpl implements AnaTagService {
   public Boolean isBigDecimalOver(DataFrame df, int row1,String col1, int row2,String col2){
     BigDecimal v1 = (BigDecimal)df.get(row1,col1);
     if(v1 == null){
-      return null;
+      return false;
     }
     BigDecimal v2 = (BigDecimal)df.get(row2,col2);
     if(v2 == null)
     {
-      return null;
+      return false;
     }
     return  v1.compareTo(v2) > 0;
   }
@@ -166,6 +163,21 @@ public class AnaTagServiceImpl implements AnaTagService {
       return null;
     }
     DataFrame df = convToDF(result.getData());
+    CoreAnnotated coreAnnotated = new CoreAnnotated();
+    for (String period : getSmaPeriods()){
+
+      String columnName = "Sma"+period;
+      List<BigDecimal> closes =  df.col("close");
+      List<BigDecimal> mas = TalibUtil.movingAverage(closes,MAType.Sma,Integer.valueOf(period));
+      df.add(columnName,mas);
+    }
+
+
+    List<BigDecimal> highs =  df.col("high");
+    List<BigDecimal> lows =  df.col("low");
+    List<BigDecimal> sars = TalibUtil.sar(highs,lows,0.1d,2d);
+    df.add("sar",sars);
+
     return  df;
   }
 
@@ -187,4 +199,16 @@ public class AnaTagServiceImpl implements AnaTagService {
     });
     return df;
   }
+
+  public Map<String,Integer> getDataframeColumsMap(DataFrame df){
+    Set<String> colums =  df.columns();
+    Map<String,Integer> map = new HashMap<>();
+    Integer i = 0;
+    for( String columnName :colums){
+      map.put(columnName,i);
+      i++;
+    }
+    return map;
+  }
+
 }

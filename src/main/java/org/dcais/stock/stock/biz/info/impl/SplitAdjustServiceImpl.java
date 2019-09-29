@@ -94,7 +94,13 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
             log.error(errMsg);
             throw new RuntimeException(errMsg);
           }
-          return calc(t,adjFactorDaily,adjFactorLatest);
+          try {
+            return calc(t,adjFactorDaily,adjFactorLatest);
+          } catch (Exception e){
+            String errMsg = "split calc failed adj factor. [tsCode]" + t.getTsCode() +"[tradeDate]"+ key;
+            log.error(errMsg,e);
+            throw e;
+          }
         }).collect(Collectors.toList());
 
 
@@ -117,6 +123,9 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
   }
 
   private BigDecimal calc(BigDecimal d, BigDecimal adj, BigDecimal adjLatest){
+    if(d== null || adj == null || adjLatest == null){
+      return BigDecimal.ZERO;
+    }
     if(adj.equals(adjLatest)){
       return d.multiply(BigDecimal.ONE);
     }

@@ -40,12 +40,16 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
 
   @Override
   public Result calcSplitAdjust(String tsCode){
+    return this.calcSplitAdjust(tsCode,false);
+  }
+  @Override
+  public Result calcSplitAdjust(String tsCode,boolean forceRemove ){
     Result<AdjFactor> rAdjFactorLatest = adjFactorService.getMaxDaily(tsCode);
     if(!rAdjFactorLatest.isSuccess()){
       return Result.wrapErrorResult("","can not get latest adjust factor");
     }
     AdjFactor adjFactorLatest = rAdjFactorLatest.getData();
-    if( isRecaculate(adjFactorLatest)){
+    if( isRecaculate(adjFactorLatest) || forceRemove){
       xSplitAdjustedDailyDao.remove(tsCode);
     }
 

@@ -8,5 +8,8 @@ import java.util.List;
 
 public interface SplitAdjustService {
   Result calcSplitAdjust(String tsCode);
+
+  Result calcSplitAdjust(String tsCode, boolean forceRemove);
+
   Result<List<SplitAdjustedDaily>> getSplitAdjustDailyList(String tsCode, Date gteDate);
 }

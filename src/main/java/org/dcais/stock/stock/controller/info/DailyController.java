@@ -2,6 +2,7 @@ package org.dcais.stock.stock.controller.info;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.DailyService;
+import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.StringUtil;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 public class DailyController {
   @Autowired
   private DailyService dailyService;
+  @Autowired
+  private SplitAdjustService splitAdjustService;
 
   @RequestMapping(value = "/syncBySymbol", method = RequestMethod.GET)
   @ResponseBody
@@ -29,5 +32,11 @@ public class DailyController {
     }
     dailyService.syncAll(mode);
     return Result.wrapSuccessfulResult("OK");
+  }
+
+  @RequestMapping(value = "/calcSplitAdjust", method = RequestMethod.GET)
+  @ResponseBody
+  public Result calcSplitAdjust(String tsCode,@RequestParam(defaultValue = "N") String isForce ){
+    return splitAdjustService.calcSplitAdjust(tsCode,"Y".equalsIgnoreCase(isForce));
   }
 }

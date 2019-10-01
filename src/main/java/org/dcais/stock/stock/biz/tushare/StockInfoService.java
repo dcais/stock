@@ -20,6 +20,7 @@ import org.dcais.stock.stock.http.tushare.result.TushareData;
 import org.dcais.stock.stock.http.tushare.result.TushareResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.jvm.hotspot.runtime.ResultTypeFinder;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
@@ -137,8 +138,12 @@ public class StockInfoService {
     return Result.wrapSuccessfulResult(daily);
   }
 
-  private Result<TushareData> request(TushareParam tushareParam) {
-    rateLimiter.acquire();
+  public RateLimiter getRateLimiter(){
+    return this.rateLimiter;
+  }
+
+  protected Result<TushareData> request(TushareParam tushareParam) {
+    getRateLimiter().acquire();
     String basic = tushareRequestApi.request(tushareParam);
     basic = StringEscapeUtils.unescapeJava(basic);
     Gson gson = JsonUtil.getGsonObj();
@@ -149,4 +154,5 @@ public class StockInfoService {
     }
     return Result.wrapSuccessfulResult(tushareResult.getData());
   }
+
 }

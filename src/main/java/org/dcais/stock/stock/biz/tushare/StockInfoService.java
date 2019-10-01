@@ -20,7 +20,6 @@ import org.dcais.stock.stock.http.tushare.result.TushareData;
 import org.dcais.stock.stock.http.tushare.result.TushareResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.jvm.hotspot.runtime.ResultTypeFinder;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;

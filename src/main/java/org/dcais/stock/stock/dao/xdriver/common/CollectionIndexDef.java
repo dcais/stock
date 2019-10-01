@@ -13,9 +13,9 @@ public class CollectionIndexDef {
   // to true</li>
   private boolean required;
   //options: int, (optional) special option flags for use when decoding GEOJSON data</li>
-  private Integer option;
+//  private Integer option;
   // srid: int, (optional) srid value for use when decoding GEOJSON data
-  private Integer srid;
+//  private Integer srid;
 
   public CollectionIndexDef(String field,String type){
     this.field = field;

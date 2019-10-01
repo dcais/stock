@@ -21,6 +21,7 @@ public class FinServieImpl implements FinService {
 
   @Override
   public Result syncFinIncome(String tsCode) {
+    log.info("sync fin incom "+tsCode);
     xFinIncomeDao.remove(tsCode);
 
     Result r = finInfoService.finIncome(tsCode);
@@ -28,7 +29,7 @@ public class FinServieImpl implements FinService {
       log.error(r.getErrorMsg());
       return r;
     }
-    
+
     List<FinIncome> finIncomes = (List<FinIncome>) r.getData();
     xFinIncomeDao.insertList(finIncomes);
     return Result.wrapSuccessfulResult("");

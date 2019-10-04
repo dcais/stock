@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.basic.BasicService;
 import org.dcais.stock.stock.biz.basic.TradeCalService;
 import org.dcais.stock.stock.biz.info.AdjFactorService;
+import org.dcais.stock.stock.biz.info.DailyBasicService;
 import org.dcais.stock.stock.biz.info.DailyService;
+import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.task.AnaTagTask;
@@ -34,6 +36,8 @@ public class StockController {
   private SARTask sarTask;
   @Autowired
   private AnaTagTask anaTagTask;
+  @Autowired
+  private DailyBasicService dailyBasicService;
 
 
   @RequestMapping(value = "/syncBasic", method = RequestMethod.GET)
@@ -64,7 +68,9 @@ public class StockController {
     basicService.sync();
     dailyService.syncAll(CmnConstants.SYNC_MODE_DATE);
     adjFactorService.syncAll(CmnConstants.SYNC_MODE_DATE);
+    dailyBasicService.syncAll(CmnConstants.SYNC_MODE_DATE);
     splitAdjustTask.startCalc();
+
 
 //    Thread tSar= new Thread(new Runnable() {
 //      @Override

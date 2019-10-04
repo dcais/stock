@@ -44,4 +44,23 @@ public class TushareRequestFields {
     , "trade_date"
     , "adj_factor"
   };
+
+  public static String[] dailyBasic = {
+    "ts_code",
+    "trade_date",
+    "close",
+    "turnover_rate",
+    "turnover_rate_f",
+    "volume_ratio",
+    "pe",
+    "pe_ttm",
+    "pb",
+    "ps",
+    "ps_ttm",
+    "total_share",
+    "float_share",
+    "free_share",
+    "total_mv",
+    "circ_mv"
+  };
 }

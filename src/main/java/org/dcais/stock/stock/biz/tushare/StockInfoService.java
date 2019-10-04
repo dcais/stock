@@ -14,6 +14,7 @@ import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.AdjFactor;
 import org.dcais.stock.stock.entity.info.Daily;
 import org.dcais.stock.stock.entity.basic.TradeCal;
+import org.dcais.stock.stock.entity.info.DailyBasic;
 import org.dcais.stock.stock.http.tushare.TushareRequestApi;
 import org.dcais.stock.stock.http.tushare.param.TushareParam;
 import org.dcais.stock.stock.http.tushare.result.TushareData;
@@ -107,6 +108,33 @@ public class StockInfoService {
     }
 
     List<Daily> daily = TushareDataParser.parse(tushareResult.getData(), Daily.class);
+    return Result.wrapSuccessfulResult(daily);
+  }
+  
+  public Result dailyBasic(String tsCode, Date tradeDate, Date startDate, Date endDate) {
+    TushareParam tushareParam = tushareParamGem.getParam("daily_basic");
+    tushareParam.setFields(TushareRequestFields.dailyBasic);
+    Map<String, Object> param = new HashMap<>();
+
+    if (StringUtil.isNotBlank(tsCode)) {
+      param.put("ts_code", tsCode);
+    }
+    if (tradeDate != null) {
+      param.put("trade_date", DateUtils.formatDate(tradeDate, DateUtils.YMD));
+    }
+    if (startDate != null) {
+      param.put("start_date", DateUtils.formatDate(startDate, DateUtils.YMD));
+    }
+    if (endDate != null) {
+      param.put("end_date", DateUtils.formatDate(endDate, DateUtils.YMD));
+    }
+    tushareParam.setParams(param);
+    Result<TushareData> tushareResult = this.request(tushareParam);
+    if (!tushareResult.isSuccess()) {
+      return tushareResult;
+    }
+
+    List<DailyBasic> daily = TushareDataParser.parse(tushareResult.getData(), DailyBasic.class);
     return Result.wrapSuccessfulResult(daily);
   }
 

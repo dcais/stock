@@ -19,7 +19,7 @@ import java.util.*;
 @Component
 public class XDailyBasicDao extends XCommon {
   @Getter
-  private String collName = "stock_x_daily_baisc";
+  private String collName = "stock_x_daily_basic";
 
   @Override
   public CollectionIndexInterface getCollectionIndexInterface() {

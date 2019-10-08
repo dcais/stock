@@ -38,7 +38,6 @@ public final class JsonUtil {
     return new GsonBuilder()
       .excludeFieldsWithModifiers(STATIC)
       .excludeFieldsWithModifiers(TRANSIENT)
-      .serializeNulls()
       .registerTypeAdapter(Date.class, new DateTypeAdapter())
       .registerTypeAdapter(Double.class, new DoubleDeserializer())
       .registerTypeAdapter(BigDecimal.class, new BigDecimalDeserializer())

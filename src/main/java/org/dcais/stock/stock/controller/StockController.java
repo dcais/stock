@@ -3,9 +3,7 @@ package org.dcais.stock.stock.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.basic.BasicService;
 import org.dcais.stock.stock.biz.basic.TradeCalService;
-import org.dcais.stock.stock.biz.info.AdjFactorService;
-import org.dcais.stock.stock.biz.info.DailyBasicService;
-import org.dcais.stock.stock.biz.info.DailyService;
+import org.dcais.stock.stock.biz.info.*;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
@@ -38,6 +36,10 @@ public class StockController {
   private AnaTagTask anaTagTask;
   @Autowired
   private DailyBasicService dailyBasicService;
+  @Autowired
+  private ConceptDetailService conceptDetailService;
+  @Autowired
+  private ConceptService conceptService;
 
 
   @RequestMapping(value = "/syncBasic", method = RequestMethod.GET)
@@ -100,6 +102,8 @@ public class StockController {
 //    }
 
     anaTagTask.startCalc();
+    conceptService.sync();
+    conceptDetailService.sync();
 
     return Result.wrapSuccessfulResult("OK");
   }

@@ -11,11 +11,8 @@ import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.JsonUtil;
 import org.dcais.stock.stock.common.utils.StringUtil;
 import org.dcais.stock.stock.entity.basic.Basic;
-import org.dcais.stock.stock.entity.info.AdjFactor;
-import org.dcais.stock.stock.entity.info.Concept;
-import org.dcais.stock.stock.entity.info.Daily;
+import org.dcais.stock.stock.entity.info.*;
 import org.dcais.stock.stock.entity.basic.TradeCal;
-import org.dcais.stock.stock.entity.info.DailyBasic;
 import org.dcais.stock.stock.http.tushare.TushareRequestApi;
 import org.dcais.stock.stock.http.tushare.param.TushareParam;
 import org.dcais.stock.stock.http.tushare.result.TushareData;
@@ -178,6 +175,25 @@ public class StockInfoService {
     List<Concept> concepts = TushareDataParser.parse(tushareResult.getData(), Concept.class);
     return Result.wrapSuccessfulResult(concepts);
   }
+
+  public Result conceptDetail(String code) {
+    TushareParam tushareParam = tushareParamGem.getParam("concept_detail");
+    Map<String, Object> param = new HashMap<>();
+    param.put("id", code);
+    tushareParam.setParams(param);
+    Result<TushareData> tushareResult = this.request(tushareParam);
+    if (!tushareResult.isSuccess()) {
+      return tushareResult;
+    }
+    List<ConceptDetail> concepts = TushareDataParser.parse(tushareResult.getData(), ConceptDetail.class);
+    for(ConceptDetail conceptDetail: concepts){
+      conceptDetail.setCode(conceptDetail.getId());
+      conceptDetail.setId(null);
+    }
+
+    return Result.wrapSuccessfulResult(concepts);
+  }
+
 
   public RateLimiter getRateLimiter(){
     return this.rateLimiter;

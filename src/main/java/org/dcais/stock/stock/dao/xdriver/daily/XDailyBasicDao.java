@@ -9,9 +9,7 @@ import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexDef;
 import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexInfo;
 import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexInterface;
 import org.dcais.stock.stock.dao.xdriver.common.XCommon;
-import org.dcais.stock.stock.entity.info.Daily;
 import org.dcais.stock.stock.entity.info.DailyBasic;
-import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
 import org.springframework.stereotype.Component;
 
 import java.util.*;

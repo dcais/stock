@@ -12,6 +12,7 @@ import org.dcais.stock.stock.common.utils.JsonUtil;
 import org.dcais.stock.stock.common.utils.StringUtil;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.AdjFactor;
+import org.dcais.stock.stock.entity.info.Concept;
 import org.dcais.stock.stock.entity.info.Daily;
 import org.dcais.stock.stock.entity.basic.TradeCal;
 import org.dcais.stock.stock.entity.info.DailyBasic;
@@ -163,6 +164,19 @@ public class StockInfoService {
 
     List<AdjFactor> daily = TushareDataParser.parse(tushareResult.getData(), AdjFactor.class);
     return Result.wrapSuccessfulResult(daily);
+  }
+
+  public Result concept() {
+    TushareParam tushareParam = tushareParamGem.getParam("concept");
+    Map<String, Object> param = new HashMap<>();
+    param.put("src", "ts");
+    tushareParam.setParams(param);
+    Result<TushareData> tushareResult = this.request(tushareParam);
+    if (!tushareResult.isSuccess()) {
+      return tushareResult;
+    }
+    List<Concept> concepts = TushareDataParser.parse(tushareResult.getData(), Concept.class);
+    return Result.wrapSuccessfulResult(concepts);
   }
 
   public RateLimiter getRateLimiter(){

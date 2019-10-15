@@ -16,7 +16,7 @@ import java.util.List;
 import static java.lang.reflect.Modifier.STATIC;
 import static java.lang.reflect.Modifier.TRANSIENT;
 
-/**
+/**travis_build
  * Created by Administrator on 14-9-12.
  */
 public final class JsonUtil {
@@ -38,6 +38,7 @@ public final class JsonUtil {
     return new GsonBuilder()
       .excludeFieldsWithModifiers(STATIC)
       .excludeFieldsWithModifiers(TRANSIENT)
+      .disableHtmlEscaping()
       .registerTypeAdapter(Date.class, new DateTypeAdapter())
       .registerTypeAdapter(Double.class, new DoubleDeserializer())
       .registerTypeAdapter(BigDecimal.class, new BigDecimalDeserializer())

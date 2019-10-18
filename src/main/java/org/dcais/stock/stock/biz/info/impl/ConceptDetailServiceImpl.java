@@ -3,6 +3,7 @@ package org.dcais.stock.stock.biz.info.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.ConceptDetailService;
 import org.dcais.stock.stock.biz.info.ConceptService;
+import org.dcais.stock.stock.biz.tushare.ConceptInfoService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.dao.xdriver.concept.XConceptDao;
@@ -20,7 +21,7 @@ public class ConceptDetailServiceImpl implements ConceptDetailService {
   @Autowired
   private XConceptDetailDao xConceptDetailDao;
   @Autowired
-  private StockInfoService stockInfoService;
+  private ConceptInfoService conceptInfoService;
   @Autowired
   private ConceptService conceptService;
 
@@ -29,7 +30,7 @@ public class ConceptDetailServiceImpl implements ConceptDetailService {
     List<Concept> concepts = conceptService.getAll();
     xConceptDetailDao.deleteAll();
     for(Concept concept:concepts){
-      Result r = stockInfoService.conceptDetail(concept.getCode());
+      Result r = conceptInfoService.conceptDetail(concept.getCode());
       if(!r.isSuccess()){
         log.error(r.getErrorMsg());
         return;

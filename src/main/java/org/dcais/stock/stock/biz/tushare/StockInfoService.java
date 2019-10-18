@@ -163,36 +163,7 @@ public class StockInfoService {
     return Result.wrapSuccessfulResult(daily);
   }
 
-  public Result concept() {
-    TushareParam tushareParam = tushareParamGem.getParam("concept");
-    Map<String, Object> param = new HashMap<>();
-    param.put("src", "ts");
-    tushareParam.setParams(param);
-    Result<TushareData> tushareResult = this.request(tushareParam);
-    if (!tushareResult.isSuccess()) {
-      return tushareResult;
-    }
-    List<Concept> concepts = TushareDataParser.parse(tushareResult.getData(), Concept.class);
-    return Result.wrapSuccessfulResult(concepts);
-  }
 
-  public Result conceptDetail(String code) {
-    TushareParam tushareParam = tushareParamGem.getParam("concept_detail");
-    Map<String, Object> param = new HashMap<>();
-    param.put("id", code);
-    tushareParam.setParams(param);
-    Result<TushareData> tushareResult = this.request(tushareParam);
-    if (!tushareResult.isSuccess()) {
-      return tushareResult;
-    }
-    List<ConceptDetail> concepts = TushareDataParser.parse(tushareResult.getData(), ConceptDetail.class);
-    for(ConceptDetail conceptDetail: concepts){
-      conceptDetail.setCode(conceptDetail.getId());
-      conceptDetail.setId(null);
-    }
-
-    return Result.wrapSuccessfulResult(concepts);
-  }
 
 
   public RateLimiter getRateLimiter(){

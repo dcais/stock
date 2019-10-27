@@ -76,5 +76,5 @@ public class FinIncome extends BaseEntity {
   private BigDecimal insuranceExp;
   private BigDecimal undistProfit;
   private BigDecimal distableProfit;
-
+  private int reportSeason;
 }

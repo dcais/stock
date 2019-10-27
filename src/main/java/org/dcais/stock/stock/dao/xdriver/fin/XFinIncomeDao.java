@@ -32,9 +32,9 @@ public class XFinIncomeDao extends XCommon {
         collectionIndexInfos.add(collectionIndexInfo);
 
         collectionIndexInfo = new CollectionIndexInfo();
-        collectionIndexInfo.setIndexName("idx_ann_date");
+        collectionIndexInfo.setIndexName("idx_end_date");
         collectionIndexInfo.setFields(new ArrayList<>());
-        collectionIndexInfo.getFields().add(new CollectionIndexDef("$.annDate", "TEXT(40)"));
+        collectionIndexInfo.getFields().add(new CollectionIndexDef("$.endDate", "TEXT(40)"));
         collectionIndexInfos.add(collectionIndexInfo);
 
         return collectionIndexInfos;

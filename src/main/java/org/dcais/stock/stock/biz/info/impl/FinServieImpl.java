@@ -48,6 +48,8 @@ public class FinServieImpl implements FinService {
       } else if (month == 11) {
         finIncome.setReportSeason(4);
       }
+      int year = cal.get(Calendar.YEAR);
+      finIncome.setReportYear(year);
     }
 
     xFinIncomeDao.insertList(finIncomes);

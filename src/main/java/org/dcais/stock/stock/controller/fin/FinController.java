@@ -33,5 +33,18 @@ public class FinController {
 
     return Result.wrapSuccessfulResult("OK");
   }
+
+  @RequestMapping(value = "/indicator/sync", method = RequestMethod.GET)
+  @ResponseBody
+  public Result indicatorSync(){
+    List<Basic> list = basicService.getAllList();
+
+    list.forEach( basic -> {
+      finService.syncFinIndicator(basic.getTsCode());
+    });
+
+    return Result.wrapSuccessfulResult("OK");
+  }
+
 }
 

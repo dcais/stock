@@ -6,7 +6,9 @@ import org.dcais.stock.stock.biz.tushare.FinInfoService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.dao.xdriver.fin.XFinIncomeDao;
+import org.dcais.stock.stock.dao.xdriver.fin.XFinIndicatorDao;
 import org.dcais.stock.stock.entity.info.FinIncome;
+import org.dcais.stock.stock.entity.info.FinIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ public class FinServieImpl implements FinService {
   private FinInfoService finInfoService;
   @Autowired
   private XFinIncomeDao xFinIncomeDao;
+  @Autowired
+  private XFinIndicatorDao xFinIndicatorDao;
 
   @Override
   public Result syncFinIncome(String tsCode) {
@@ -34,25 +38,25 @@ public class FinServieImpl implements FinService {
     }
 
     List<FinIncome> finIncomes = (List<FinIncome>) r.getData();
-    for (FinIncome finIncome : finIncomes){
-      Date endDate = DateUtils.smartFormat(finIncome.getEndDate());
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(endDate);
-      int month = cal.get(Calendar.MONTH);
-      if(month == 2){
-        finIncome.setReportSeason(1);
-      }else if (month == 5) {
-        finIncome.setReportSeason(2);
-      } else if (month == 8) {
-        finIncome.setReportSeason(3);
-      } else if (month == 11) {
-        finIncome.setReportSeason(4);
-      }
-      int year = cal.get(Calendar.YEAR);
-      finIncome.setReportYear(year);
-    }
 
     xFinIncomeDao.insertList(finIncomes);
+    return Result.wrapSuccessfulResult("");
+  }
+
+  @Override
+  public Result syncFinIndicator(String tsCode) {
+    log.info("sync fin indicator"+tsCode);
+    xFinIncomeDao.remove(tsCode);
+
+    Result r = finInfoService.finIndicator(tsCode);
+    if(!r.isSuccess()){
+      log.error(r.getErrorMsg());
+      return r;
+    }
+
+    List<FinIndicator> finIndicators= (List<FinIndicator>) r.getData();
+
+    xFinIndicatorDao.insertList(finIndicators);
     return Result.wrapSuccessfulResult("");
   }
 }

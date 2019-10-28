@@ -9,4 +9,5 @@ import java.util.List;
 public interface FinService {
   Result syncFinIncome(String tsCode);
 
+  Result syncFinIndicator(String tsCode);
 }

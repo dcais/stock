@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import org.dcais.stock.stock.biz.tushare.parser.TushareDataParser;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.entity.info.FinIncome;
+import org.dcais.stock.stock.entity.info.FinIndicator;
 import org.dcais.stock.stock.http.tushare.param.TushareParam;
 import org.dcais.stock.stock.http.tushare.result.TushareData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +36,27 @@ public class FinInfoService extends StockInfoService {
     TushareParam tushareParam = tushareParamGem.getParam("income");
     Map<String, Object> param = new HashMap<>();
     param.put("ts_code", tsCode);
-
     tushareParam.setParams(param);
+    tushareParam.setFields(TushareRequestFields.fin_income);
     Result<TushareData> tushareResult = this.request(tushareParam);
     if (!tushareResult.isSuccess()) {
       return tushareResult;
     }
     List<FinIncome> finIncomes = TushareDataParser.parse(tushareResult.getData(), FinIncome.class);
+    return Result.wrapSuccessfulResult(finIncomes);
+  }
+
+  public Result finIndicator(String tsCode) {
+    TushareParam tushareParam = tushareParamGem.getParam("fina_indicator");
+    Map<String, Object> param = new HashMap<>();
+    param.put("ts_code", tsCode);
+    tushareParam.setParams(param);
+    tushareParam.setFields(TushareRequestFields.fin_indicator);
+    Result<TushareData> tushareResult = this.request(tushareParam);
+    if (!tushareResult.isSuccess()) {
+      return tushareResult;
+    }
+    List<FinIndicator> finIncomes = TushareDataParser.parse(tushareResult.getData(), FinIndicator.class);
     return Result.wrapSuccessfulResult(finIncomes);
   }
 

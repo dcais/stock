@@ -22,10 +22,14 @@ public class FinServiceTests extends AbstractTestNGSpringContextTests {
   @Autowired
   private FinService finService;
 
-  @Test(enabled = true)
-  public void syncFinInfo() {
+  @Test(enabled = false)
+  public void syncFinIncome() {
     Result r = finService.syncFinIncome("000001.SZ");
   }
 
+  @Test(enabled = true)
+  public void syncFinIndicator() {
+    Result r = finService.syncFinIndicator("000001.SZ");
+  }
 
 }

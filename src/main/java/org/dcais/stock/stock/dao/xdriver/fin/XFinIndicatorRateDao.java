@@ -8,17 +8,18 @@ import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexDef;
 import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexInfo;
 import org.dcais.stock.stock.dao.xdriver.common.CollectionIndexInterface;
 import org.dcais.stock.stock.dao.xdriver.common.XCommon;
-import org.dcais.stock.stock.entity.info.FinIncome;
 import org.dcais.stock.stock.entity.info.FinIndicator;
-import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
-public class XFinIndicatorDao extends XCommon {
+public class XFinIndicatorRateDao extends XCommon {
   @Getter
-  private String collName = "stock_x_fin_indicator";
+  private String collName = "stock_x_fin_indicator_rate";
 
   @Override
   public CollectionIndexInterface getCollectionIndexInterface() {
@@ -69,20 +70,11 @@ public class XFinIndicatorDao extends XCommon {
     col.remove("tsCode=:tsCode").bind("tsCode",tsCode).execute();
   }
 
-  public List<FinIndicator> get(int reportYear , int reportSeason){
+  public void remove(int reportYear, int reportSeason){
     Collection col = getCollection();
     Map<String,Object> params = new HashMap<>();
     params.put("reportYear",reportYear);
     params.put("reportSeason",reportSeason);
-    DocResult docs = col.find("reportYear=:reportYear and reportSeason=:reportSeason").bind(params).execute();
-    if(!docs.hasData()){
-      return new ArrayList<>();
-    }
-    List<FinIndicator> results = new LinkedList<>();
-    docs.forEach(dbDoc -> {
-      FinIndicator finIndicator = JsonUtil.getGsonObj().fromJson( dbDoc.toString(), FinIndicator.class );
-      results.add(finIndicator);
-    });
-    return results;
+    col.remove("reportYear=:reportYear and reportSeason=:reportSeason").bind(params).execute();
   }
 }

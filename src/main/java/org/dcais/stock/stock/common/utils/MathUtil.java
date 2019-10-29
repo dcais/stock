@@ -113,7 +113,7 @@ public class MathUtil {
       return new BigDecimal("0");
     }
     if (two == null) {
-      throw new RuntimeException("数据错误,被出数为空. 除数为:" + toPriceFormat(one));
+      throw new RuntimeException("数据错误,除数为空. 被除数为:" + toPriceFormat(one));
     }
     return one.divide(two, 2, RoundingMode.DOWN);
   }

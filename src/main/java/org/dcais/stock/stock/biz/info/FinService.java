@@ -10,4 +10,6 @@ public interface FinService {
   Result syncFinIncome(String tsCode);
 
   Result syncFinIndicator(String tsCode);
+
+  Result calcFinIndicatorRate(int reportYear, int reportSeason);
 }

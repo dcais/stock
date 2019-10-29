@@ -4,24 +4,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.FinService;
 import org.dcais.stock.stock.biz.tushare.FinInfoService;
 import org.dcais.stock.stock.common.result.Result;
-import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.MathUtil;
 import org.dcais.stock.stock.common.utils.ReflectUtils;
 import org.dcais.stock.stock.dao.xdriver.fin.XFinIncomeDao;
 import org.dcais.stock.stock.dao.xdriver.fin.XFinIndicatorDao;
 import org.dcais.stock.stock.dao.xdriver.fin.XFinIndicatorRateDao;
-import org.dcais.stock.stock.entity.info.FinBase;
 import org.dcais.stock.stock.entity.info.FinIncome;
 import org.dcais.stock.stock.entity.info.FinIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.jvm.hotspot.tools.FinalizerInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

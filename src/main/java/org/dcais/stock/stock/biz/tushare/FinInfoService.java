@@ -3,6 +3,7 @@ package org.dcais.stock.stock.biz.tushare;
 import com.google.common.util.concurrent.RateLimiter;
 import org.dcais.stock.stock.biz.tushare.parser.TushareDataParser;
 import org.dcais.stock.stock.common.result.Result;
+import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.entity.info.FinIncome;
 import org.dcais.stock.stock.entity.info.FinIndicator;
 import org.dcais.stock.stock.http.tushare.param.TushareParam;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +34,13 @@ public class FinInfoService extends StockInfoService {
     return this.rateLimiter;
   }
 
-  public Result finIncome(String tsCode) {
+  public Result finIncome(String tsCode,Date startDate) {
     TushareParam tushareParam = tushareParamGem.getParam("income");
     Map<String, Object> param = new HashMap<>();
     param.put("ts_code", tsCode);
+    if( startDate != null ){
+      param.put("start_date", DateUtils.formatDate(startDate,DateUtils.YMD));
+    }
     tushareParam.setParams(param);
     tushareParam.setFields(TushareRequestFields.fin_income);
     Result<TushareData> tushareResult = this.request(tushareParam);
@@ -46,10 +51,13 @@ public class FinInfoService extends StockInfoService {
     return Result.wrapSuccessfulResult(finIncomes);
   }
 
-  public Result finIndicator(String tsCode) {
+  public Result finIndicator(String tsCode, Date startDate) {
     TushareParam tushareParam = tushareParamGem.getParam("fina_indicator");
     Map<String, Object> param = new HashMap<>();
     param.put("ts_code", tsCode);
+    if( startDate != null ){
+      param.put("start_date", DateUtils.formatDate(startDate,DateUtils.YMD));
+    }
     tushareParam.setParams(param);
     tushareParam.setFields(TushareRequestFields.fin_indicator);
     Result<TushareData> tushareResult = this.request(tushareParam);

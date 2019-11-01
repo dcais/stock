@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.FinService;
 import org.dcais.stock.stock.biz.tushare.FinInfoService;
 import org.dcais.stock.stock.common.result.Result;
-import org.dcais.stock.stock.common.utils.MathUtil;
-import org.dcais.stock.stock.common.utils.ReflectUtils;
+import org.dcais.stock.stock.common.utils.*;
 import org.dcais.stock.stock.dao.xdriver.fin.XFinIncomeDao;
 import org.dcais.stock.stock.dao.xdriver.fin.XFinIndicatorDao;
 import org.dcais.stock.stock.dao.xdriver.fin.XFinIndicatorRateDao;
@@ -37,34 +36,56 @@ public class FinServieImpl implements FinService {
   @Override
   public Result syncFinIncome(String tsCode) {
     log.info("sync fin income "+tsCode);
-    xFinIncomeDao.remove(tsCode);
+    Date startDate = null;
+    FinIncome lastData = xFinIncomeDao.getLast(tsCode);
+    if(lastData != null){
+      Date lastUpdate = DateUtils.smartFormat(lastData.getEndDate());
+      Calendar ca = Calendar.getInstance();
+      ca.setTime(lastUpdate);
+      ca.add(Calendar.DATE,1);
+      startDate = ca.getTime();
+    }
 
-    Result r = finInfoService.finIncome(tsCode);
+    Result r = finInfoService.finIncome(tsCode,startDate);
     if(!r.isSuccess()){
       log.error(r.getErrorMsg());
       return r;
     }
 
     List<FinIncome> finIncomes = (List<FinIncome>) r.getData();
+    if(!ListUtil.isBlank(finIncomes)){
+      xFinIncomeDao.insertList(finIncomes);
+    }
 
-    xFinIncomeDao.insertList(finIncomes);
     return Result.wrapSuccessfulResult("");
   }
 
   @Override
   public Result syncFinIndicator(String tsCode) {
     log.info("sync fin indicator"+tsCode);
-    xFinIncomeDao.remove(tsCode);
+//    xFinIndicatorDao.remove(tsCode);
+    FinIndicator lastData = xFinIndicatorDao.getLast(tsCode);
 
-    Result r = finInfoService.finIndicator(tsCode);
+    Date startDate = null;
+    if(lastData != null){
+      Date lastUpdate = DateUtils.smartFormat(lastData.getEndDate());
+      Calendar ca = Calendar.getInstance();
+      ca.setTime(lastUpdate);
+      ca.add(Calendar.DATE,1);
+      startDate = ca.getTime();
+    }
+
+    Result r = finInfoService.finIndicator(tsCode,startDate);
     if(!r.isSuccess()){
       log.error(r.getErrorMsg());
       return r;
     }
 
     List<FinIndicator> finIndicators= (List<FinIndicator>) r.getData();
+    if( ListUtil.isBlank(finIndicators) == false ){
+      xFinIndicatorDao.insertList(finIndicators);
+    }
 
-    xFinIndicatorDao.insertList(finIndicators);
     return Result.wrapSuccessfulResult("");
   }
 

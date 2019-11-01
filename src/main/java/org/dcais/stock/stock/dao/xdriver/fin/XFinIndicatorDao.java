@@ -104,4 +104,20 @@ public class XFinIndicatorDao extends XCommon {
     FinIndicator finIndicator = JsonUtil.getGsonObj().fromJson( dbDoc.toString(), FinIndicator.class );
     return finIndicator;
   }
+
+  public FinIndicator getLast(String tsCode) {
+    Collection col = getCollection();
+    Map<String, Object> params = new HashMap<>();
+    params.put("tsCode",tsCode);
+    DocResult docs = col.find("tsCode=:tsCode").bind(params).orderBy("reportYear desc,reportSeason desc").execute();
+    if (!docs.hasData()) {
+      return null;
+    }
+    DbDoc dbDoc = docs.fetchOne();
+    if (dbDoc == null) {
+      return null;
+    }
+    FinIndicator finIndicator = JsonUtil.getGsonObj().fromJson(dbDoc.toString(), FinIndicator.class);
+    return finIndicator;
+  }
 }

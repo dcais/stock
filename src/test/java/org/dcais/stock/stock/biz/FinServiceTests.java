@@ -27,7 +27,7 @@ public class FinServiceTests extends AbstractTestNGSpringContextTests {
     Result r = finService.syncFinIncome("000001.SZ");
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void syncFinIndicator() {
     Result r = finService.syncFinIndicator("000001.SZ");
   }
@@ -36,7 +36,7 @@ public class FinServiceTests extends AbstractTestNGSpringContextTests {
     Result r = finService.calcFinIndicatorRate(1999,1);
   }
 
-  @Test(enabled = true)
+  @Test(enabled = false)
   public void getCANSLIMCandidates(){
     Result r = finService.getCANSLIMCandidates(2019,3);
   }

@@ -12,4 +12,6 @@ public interface FinService {
   Result syncFinIndicator(String tsCode);
 
   Result calcFinIndicatorRate(int reportYear, int reportSeason);
+
+  Result getCANSLIMCandidates(int reportYear, int reportSeason);
 }

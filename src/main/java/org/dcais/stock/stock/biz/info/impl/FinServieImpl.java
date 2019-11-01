@@ -12,14 +12,14 @@ import org.dcais.stock.stock.dao.xdriver.fin.XFinIndicatorRateDao;
 import org.dcais.stock.stock.entity.info.FinIncome;
 import org.dcais.stock.stock.entity.info.FinIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ZeroCopyHttpOutputMessage;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -98,7 +98,7 @@ public class FinServieImpl implements FinService {
           else if(BigDecimal.ZERO.compareTo(last) == 0){
             rate = null;
           }else{
-            rate = MathUtil.divide(diff,last);
+            rate = MathUtil.divide(diff,last.abs());
           }
           setMethod.invoke(dataRate,rate);
         }
@@ -129,5 +129,108 @@ public class FinServieImpl implements FinService {
     xFinIndicatorRateDao.remove(reportYear,reportSeason);
     xFinIndicatorRateDao.insertList(rates);
     return Result.wrapSuccessfulResult("OK");
+  }
+
+  public Map<String,Integer> getPrevYearAndSeason(int reportYear, int reportSeason){
+    Integer retReportSeason = reportSeason -1;
+    Integer retReportYear = reportYear;
+    if(retReportSeason== 0){
+      retReportYear = retReportYear -1;
+      retReportSeason = 4;
+    }
+    Map<String,Integer> ret = new HashMap();
+    ret.put("reportYear",retReportYear);
+    ret.put("reportSeason",retReportSeason);
+    return ret;
+
+  }
+
+  public boolean checkFinIncrease(String tsCode, int reportYear, int reportSeason ){
+    FinIndicator finIndicatorRate = xFinIndicatorRateDao.get(tsCode,reportYear,reportSeason);
+    FinIndicator finIndicator = xFinIndicatorDao.get(tsCode,reportYear,reportSeason);
+    if(finIndicator == null){
+      return false;
+    }
+    if(finIndicatorRate == null ){
+      return false;
+    }
+    if(finIndicatorRate.getEps() == null){
+      return false;
+    }
+    if(finIndicatorRate.getEps().compareTo(new BigDecimal(0.17))<0){
+      return false;
+    }
+    if(finIndicatorRate.getTotalRevenuePs() == null){
+      return false;
+    }
+    if(finIndicatorRate.getTotalRevenuePs().compareTo(new BigDecimal(0.17))<0){
+      return false;
+    }
+    if(finIndicator.getRoe() == null){
+      return false;
+    }
+    if(finIndicator.getRoe().compareTo(new BigDecimal(0.15))<0) {
+      return false;
+    }
+    if(finIndicator.getCfps() == null){
+      return false;
+    }
+    if(finIndicator.getEps() == null) {
+      return false;
+    }
+    if(finIndicator.getEps().compareTo(BigDecimal.ZERO) <= 0 ){
+      return false;
+    }
+    if(MathUtil.divide(finIndicator.getCfps(),finIndicator.getEps()).compareTo(new BigDecimal(0.17))<0){
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public Result getCANSLIMCandidates(int reportYear, int reportSeason){
+    List<FinIndicator> rateCurSeason = xFinIndicatorDao.get(reportYear,reportSeason);
+    List<String> tsCodes = rateCurSeason.stream()
+//      .filter(t->{ return t.getEps() != null && t.getEps().compareTo(BigDecimal.ONE) > 0; })
+      .map(FinIndicator::getTsCode).collect(Collectors.toList());
+    List<String> targets = new ArrayList<>();
+    for(String tsCode : tsCodes){
+      int seasonCnt = 4 ;
+      int checkReportYear = reportYear;
+      int checkReportSeason = reportSeason;
+      boolean bResult = false;
+      do {
+        bResult = checkFinIncrease(tsCode,checkReportYear,checkReportSeason);
+        Map<String,Integer> mapNext = this.getPrevYearAndSeason(checkReportYear,checkReportSeason);
+        checkReportYear = mapNext.get("reportYear");
+        checkReportSeason = mapNext.get("reportSeason");
+        seasonCnt --;
+        if(bResult == false){
+          break;
+        }
+      }while (seasonCnt >= 0);
+      if (bResult == false){
+        continue;
+      }
+
+      int yearCnt = 1;
+      checkReportYear = reportYear;
+      checkReportSeason = reportSeason;
+      bResult = false;
+      do {
+        bResult = checkFinIncrease(tsCode,checkReportYear,checkReportSeason);
+        checkReportYear = checkReportYear -1;
+        yearCnt --;
+        if(bResult == false){
+          break;
+        }
+      }while (yearCnt>= 0);
+      if (bResult == false){
+        continue;
+      }
+
+      targets.add(tsCode);
+    }
+    return Result.wrapSuccessfulResult(targets);
   }
 }

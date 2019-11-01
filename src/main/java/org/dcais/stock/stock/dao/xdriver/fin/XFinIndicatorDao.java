@@ -1,6 +1,7 @@
 package org.dcais.stock.stock.dao.xdriver.fin;
 
 import com.mysql.cj.xdevapi.Collection;
+import com.mysql.cj.xdevapi.DbDoc;
 import com.mysql.cj.xdevapi.DocResult;
 import lombok.Getter;
 import org.dcais.stock.stock.common.utils.JsonUtil;
@@ -84,5 +85,23 @@ public class XFinIndicatorDao extends XCommon {
       results.add(finIndicator);
     });
     return results;
+  }
+
+  public FinIndicator get(String tsCode , int reportYear , int reportSeason){
+    Collection col = getCollection();
+    Map<String,Object> params = new HashMap<>();
+    params.put("tsCode",tsCode);
+    params.put("reportYear",reportYear);
+    params.put("reportSeason",reportSeason);
+    DocResult docs = col.find("tsCode=:tsCode and reportYear=:reportYear and reportSeason=:reportSeason").bind(params).execute();
+    if(!docs.hasData()){
+      return null;
+    }
+    DbDoc dbDoc = docs.fetchOne();
+    if(dbDoc == null ){
+      return null;
+    }
+    FinIndicator finIndicator = JsonUtil.getGsonObj().fromJson( dbDoc.toString(), FinIndicator.class );
+    return finIndicator;
   }
 }

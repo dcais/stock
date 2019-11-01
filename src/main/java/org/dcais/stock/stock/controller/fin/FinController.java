@@ -60,6 +60,13 @@ public class FinController {
     return  Result.wrapSuccessfulResult("OK");
   }
 
+  @RequestMapping(value="getCANSLIMCandidates")
+  @ResponseBody
+  public Result getCANSLIMCandidates(Integer year ,Integer season){
+    return finService.getCANSLIMCandidates(year,season);
+  }
+
+
 
 }
 

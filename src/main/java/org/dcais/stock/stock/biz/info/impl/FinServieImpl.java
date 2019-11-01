@@ -116,7 +116,7 @@ public class FinServieImpl implements FinService {
   public Result calcFinIndicatorRate(int reportYear, int reportSeason){
     List<FinIndicator> finIndicators =xFinIndicatorDao.get(reportYear,reportSeason);
     List<FinIndicator> finIndicatorsLastYear = xFinIndicatorDao.get(reportYear-1,reportSeason);
-    Map<String,FinIndicator> mapLastYear = finIndicatorsLastYear.stream().collect(Collectors.toMap(FinIndicator::getTsCode, Function.identity()));
+    Map<String,FinIndicator> mapLastYear = finIndicatorsLastYear.stream().collect(Collectors.toMap(FinIndicator::getTsCode, Function.identity(), (t1,t2)-> t1));
     List<FinIndicator> rates = finIndicators.stream().map( dataNow->{
       FinIndicator dataLast = mapLastYear.get(dataNow.getTsCode());
       if(dataLast == null){

@@ -131,4 +131,13 @@
     from stock_trade_cal
     where exchange = #{exchange}
   </select>
+
+  <select id="getLastTradeDate" resultMap="BaseResultMap">
+    select * from stock_trade_cal
+    where date_sub(now(), interval 17 hour) > cal_date
+    and exchange = #{exchange}
+    and is_open = 1
+    order by cal_date desc
+    limit 1
+  </select>
 </mapper>

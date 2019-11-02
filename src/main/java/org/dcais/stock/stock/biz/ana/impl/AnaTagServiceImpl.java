@@ -10,6 +10,7 @@ import org.dcais.stock.stock.biz.basic.BasicService;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.DateUtils;
+import org.dcais.stock.stock.common.utils.MathUtil;
 import org.dcais.stock.stock.common.utils.StringUtil;
 import org.dcais.stock.stock.common.utils.TalibUtil;
 import org.dcais.stock.stock.dao.xdriver.ana.XAnaTagDao;
@@ -57,9 +58,9 @@ public class AnaTagServiceImpl implements AnaTagService {
     Basic stock = basicService.getByTsCode(tsCode);
     Calendar ca = Calendar.getInstance();
     ca.setTime(DateUtils.getStartTimeDate(new Date()));
-    ca.add(Calendar.MONTH,-3);
+    ca.add(Calendar.MONTH,-6);
     Date gteDate = ca.getTime();
-    DataFrame df = this.getDataFrame(tsCode,gteDate);
+    DataFrame df = this.getDataFrame(tsCode,gteDate,null);
     List<TecMa> list = null;
     List<BigDecimal> ma = null;
 
@@ -156,8 +157,8 @@ public class AnaTagServiceImpl implements AnaTagService {
   }
 
 
-  public DataFrame getDataFrame(String tsCode,Date gteDate) {
-    Result<List<SplitAdjustedDaily>> result  = splitAdjustService.getSplitAdjustDailyList(tsCode, gteDate);
+  public DataFrame getDataFrame(String tsCode,Date gteDate, Date lteDate) {
+    Result<List<SplitAdjustedDaily>> result  = splitAdjustService.getSplitAdjustDailyList(tsCode, gteDate,lteDate);
     if(!result.isSuccess()){
       log.error(result.getErrorMsg());
       return null;
@@ -209,6 +210,50 @@ public class AnaTagServiceImpl implements AnaTagService {
       i++;
     }
     return map;
+  }
+
+
+  @Override
+  public void anaRS50(Date tradeDate){
+    List<Basic> allBasics = basicService.getAllList();
+    List<Map<String,Object>> rates = new ArrayList<>();
+    for(Basic basic : allBasics) {
+      String tsCode =basic.getTsCode();
+      Calendar ca = Calendar.getInstance();
+      ca.setTime(DateUtils.getStartTimeDate(new Date()));
+      ca.add(Calendar.MONTH,-4);
+      Date gteDate = ca.getTime();
+      DataFrame df = this.getDataFrame(tsCode,gteDate, tradeDate);
+      if(df.length()< 50){
+        continue;
+      }
+      Date tradeDateInDf = (Date) df.get(df.length()-1,"tradeDate");
+      BigDecimal rate = new BigDecimal(-1000000);
+      if(DateUtils.formatDate(tradeDateInDf,DateUtils.YMD).equals(DateUtils.formatDate(tradeDate,DateUtils.YMD))){
+        BigDecimal lastClose = (BigDecimal) df.get(df.length()-1,"close");
+        BigDecimal last50Close = (BigDecimal) df.get(df.length() - 50 , "close");
+        rate = MathUtil.subtract(lastClose,last50Close).divide(last50Close);
+      }
+      Map<String,Object> item = new HashMap<>();
+
+      item.put("tsCode",tsCode);
+      item.put("rate",rate);
+      rates.add(item);
+    }
+    List<Map<String,Object>> sortedRates = rates.stream().sorted((l,r)-> {
+      BigDecimal left = (BigDecimal) l.get("rate");
+      BigDecimal right = (BigDecimal) r.get("rate");
+      return left.compareTo(right);
+    }).collect(Collectors.toList());
+
+    int size = sortedRates.size();
+    for(int i = 0 ; i< sortedRates.size() ; i ++ ){
+      Map<String,Object> item = sortedRates.get(i);
+      BigDecimal rs = MathUtil.divide(new BigDecimal(i).multiply(new BigDecimal(100)),new BigDecimal(size));
+      item.put("RS",rs);
+      xAnaTagDao.modify((String) item.get("tsCode"),tradeDate, "RS",rs);
+    }
+
   }
 
 }

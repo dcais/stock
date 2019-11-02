@@ -115,14 +115,14 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
   }
 
   @Override
-  public Result<List<SplitAdjustedDaily>> getSplitAdjustDailyList(String tsCode, Date gteDate) {
+  public Result<List<SplitAdjustedDaily>> getSplitAdjustDailyList(String tsCode, Date gteDate,Date lteDate) {
     if(StringUtil.isBlank(tsCode)){
       return Result.wrapErrorResult("","no ts code");
     }
     if(gteDate == null ){
       gteDate = DateUtils.smartFormat("1970-01-01");
     }
-    List<SplitAdjustedDaily> datas = this.xSplitAdjustedDailyDao.getFromDate(tsCode,gteDate);
+    List<SplitAdjustedDaily> datas = this.xSplitAdjustedDailyDao.getFromDate(tsCode,gteDate,lteDate);
     return Result.wrapSuccessfulResult(datas);
   }
 

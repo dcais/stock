@@ -11,5 +11,5 @@ public interface SplitAdjustService {
 
   Result calcSplitAdjust(String tsCode, boolean forceRemove);
 
-  Result<List<SplitAdjustedDaily>> getSplitAdjustDailyList(String tsCode, Date gteDate);
+  Result<List<SplitAdjustedDaily>> getSplitAdjustDailyList(String tsCode, Date gteDate,Date lteDate);
 }

@@ -3,10 +3,12 @@ package org.dcais.stock.stock.task;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.ana.AnaTagService;
 import org.dcais.stock.stock.biz.basic.BasicService;
+import org.dcais.stock.stock.biz.basic.TradeCalService;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,6 +22,8 @@ public class AnaTagTask {
   private AnaTagService anaTagService;
   @Autowired
   private ThreadPoolExecutor threadPoolExecutor;
+  @Autowired
+  private TradeCalService tradeCalService;
 
   public void startCalc(){
     log.info("AnaTagTask Start");
@@ -43,6 +47,10 @@ public class AnaTagTask {
         }
       });
     });
+
+    Date lastTradeDate = tradeCalService.getLastTradeDate();
+    anaTagService.anaRS50(lastTradeDate);
+
 
     try {
       latch.await();

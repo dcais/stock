@@ -80,4 +80,10 @@ public class TradeCalServiceImpl extends BaseServiceImpl implements TradeCalServ
     Arrays.stream(exchanges).forEach(f::apply);
     return Result.wrapSuccessfulResult("OK");
   }
+
+  @Override
+  public Date getLastTradeDate(){
+    List<TradeCal> tradeCals = calDateDao.getLastTradeDate(BizConstans.EXCHANGE_SSE);
+    return tradeCals.get(0).getCalDate();
+  }
 }

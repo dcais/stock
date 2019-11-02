@@ -71,16 +71,24 @@ public class XSplitAdjustedDailyDao extends XCommon {
     return splitAdjustedDaily;
   }
 
-  public List<SplitAdjustedDaily> getFromDate(String tsCode, Date gteDate){
+  public List<SplitAdjustedDaily> getFromDate(String tsCode, Date gteDate, Date lteDate){
     String strDate = DateUtils.formatDate(gteDate,DateUtils.ISO_DATE_TIME);
     Collection col = getCollection();
     Map<String,Object> param = new HashMap<>();
     param.put("tsCode",tsCode);
     param.put("gteTradeDate", gteDate);
-    DocResult docs = col.find("tsCode=:tsCode AND tradeDate>=:gteTradeDate").sort("tradeDate ").bind(param).execute();
+    if( lteDate != null ){
+      param.put("lteTradeDate", gteDate);
+    }
+    String query = "tsCode=:tsCode AND tradeDate>=:gteTradeDate";
+    if( lteDate != null ){
+      query = query + " AND tradeDate <=:lteTradeDate";
+    }
+    DocResult docs = col.find(query).sort("tradeDate ").bind(param).execute();
     if(!docs.hasData()){
       return new ArrayList<>();
     }
+
     List<SplitAdjustedDaily> results = new LinkedList<>();
     docs.forEach(dbDoc -> {
       SplitAdjustedDaily  splitAdjustedDaily = JsonUtil.getGsonObj().fromJson( dbDoc.toString(), SplitAdjustedDaily.class );

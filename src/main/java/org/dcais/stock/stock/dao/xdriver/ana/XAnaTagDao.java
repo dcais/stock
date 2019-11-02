@@ -64,4 +64,12 @@ public class XAnaTagDao extends XCommon {
     String json = JsonUtil.toJson(tags);
     col.add(json).execute();
   }
+
+  public void modify(String tsCode, Date tradeDate, String key, Object value){
+    Collection col = this.getCollection();
+    Map<String,Object> params = new HashMap<>();
+    params.put("tsCode",tsCode);
+    params.put("tradeDate", DateUtils.formatDate(tradeDate,DateUtils.ISO_DATE_TIME));
+    col.modify("tsCode = :tsCode AND tradeDate = :tradeDate").set(key,value).bind(params).execute();
+  }
 }

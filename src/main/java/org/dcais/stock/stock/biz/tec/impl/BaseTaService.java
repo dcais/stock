@@ -43,7 +43,7 @@ public abstract class BaseTaService {
   }
 
   public DataFrame getDataFrame(String tsCode, Date gteDate) {
-    Result<List<SplitAdjustedDaily>> result  = splitAdjustService.getSplitAdjustDailyList(tsCode, gteDate);
+    Result<List<SplitAdjustedDaily>> result  = splitAdjustService.getSplitAdjustDailyList(tsCode, gteDate,null);
     if(!result.isSuccess()){
       log.error(result.getErrorMsg());
       return null;

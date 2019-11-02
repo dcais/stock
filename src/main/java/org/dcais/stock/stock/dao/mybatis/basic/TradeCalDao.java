@@ -17,4 +17,6 @@ public interface TradeCalDao extends BaseDao<TradeCal> {
   Integer selectCount(Map<String, Object> params);
 
   Date selectMaxCalDate(String exchange);
+
+  List<TradeCal> getLastTradeDate(String exchange);
 }

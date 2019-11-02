@@ -4,6 +4,7 @@ package org.dcais.stock.stock.biz.basic;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.entity.basic.TradeCal;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,4 +26,6 @@ public interface TradeCalService {
 
 
   Result sync();
+
+  Date getLastTradeDate();
 }

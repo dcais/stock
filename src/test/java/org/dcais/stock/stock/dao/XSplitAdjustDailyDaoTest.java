@@ -50,7 +50,7 @@ public class XSplitAdjustDailyDaoTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void getFromDate(){
-    List<SplitAdjustedDaily> list = xSplitAdjustedDailyDao.getFromDate("000001.SZ", DateUtils.smartFormat("2001-01-03"));
+    List<SplitAdjustedDaily> list = xSplitAdjustedDailyDao.getFromDate("000001.SZ", DateUtils.smartFormat("2001-01-03"),null);
     log.info(JsonUtil.toJson(list.get(0)));
 
   }

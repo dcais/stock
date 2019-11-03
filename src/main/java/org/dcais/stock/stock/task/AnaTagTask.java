@@ -48,8 +48,6 @@ public class AnaTagTask {
       });
     });
 
-    Date lastTradeDate = tradeCalService.getLastTradeDate();
-    anaTagService.anaRS50(lastTradeDate);
 
 
     try {
@@ -57,6 +55,9 @@ public class AnaTagTask {
     } catch (InterruptedException e) {
       log.error("",e);
     }
+
+    Date lastTradeDate = tradeCalService.getLastTradeDate();
+    anaTagService.anaRS50(lastTradeDate);
     log.info("AnaTagTask Done");
   }
 }

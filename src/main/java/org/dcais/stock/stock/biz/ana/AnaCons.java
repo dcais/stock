@@ -23,5 +23,10 @@ public interface AnaCons {
   String ANA_CONS_LOW="low";
   String ANA_CONS_SAR="sar";
 
+  String ANA_CONS_MACD="macd";
+  String ANA_CONS_MACDSIGNAL="macdSignal";
+  String ANA_CONS_MACDHIST="macdHist";
+  String ANA_CONS_CCI="cci";
+
   String ANA_CONS_SAR_SIGNAL="sarSignal";
 }

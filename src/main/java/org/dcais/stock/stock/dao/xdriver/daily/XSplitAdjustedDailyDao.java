@@ -72,13 +72,17 @@ public class XSplitAdjustedDailyDao extends XCommon {
   }
 
   public List<SplitAdjustedDaily> getFromDate(String tsCode, Date gteDate, Date lteDate){
-    String strDate = DateUtils.formatDate(gteDate,DateUtils.ISO_DATE_TIME);
+    String strDateGte= DateUtils.formatDate(gteDate,DateUtils.ISO_DATE_TIME);
+    String strDateLte = null;
+    if( lteDate != null ){
+      strDateLte = DateUtils.formatDate(lteDate,DateUtils.ISO_DATE_TIME);
+    }
     Collection col = getCollection();
     Map<String,Object> param = new HashMap<>();
     param.put("tsCode",tsCode);
-    param.put("gteTradeDate", gteDate);
+    param.put("gteTradeDate", strDateGte);
     if( lteDate != null ){
-      param.put("lteTradeDate", gteDate);
+      param.put("lteTradeDate", strDateLte);
     }
     String query = "tsCode=:tsCode AND tradeDate>=:gteTradeDate";
     if( lteDate != null ){

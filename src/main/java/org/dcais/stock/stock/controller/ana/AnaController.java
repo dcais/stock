@@ -31,12 +31,4 @@ public class AnaController {
     return Result.wrapSuccessfulResult("OK");
   }
 
-  @RequestMapping(value = "/rs50", method = RequestMethod.GET)
-  @ResponseBody
-  public Result rs50() {
-    Date lastTradeDate = tradeCalService.getLastTradeDate();
-    anaTagService.anaRS50(lastTradeDate);
-    return Result.wrapSuccessfulResult("OK");
-  }
-
 }

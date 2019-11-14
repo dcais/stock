@@ -3,12 +3,15 @@ package org.dcais.stock.stock.common.utils;
 import com.tictactec.ta.lib.CoreAnnotated;
 import com.tictactec.ta.lib.MAType;
 import com.tictactec.ta.lib.MInteger;
+import javafx.beans.binding.ListBinding;
 import joinery.DataFrame;
 import org.dcais.stock.stock.entity.tec.TecMa;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TalibUtil {
   public static List<BigDecimal> movingAverage(List<BigDecimal> closes,MAType maType,int period){
@@ -70,4 +73,71 @@ public class TalibUtil {
     }
     return list;
   }
+
+  public static List<BigDecimal> CCI(List<BigDecimal> highs, List<BigDecimal> lows, List<BigDecimal> closes,int period){
+    double[] arrHigh = new double[highs.size()];
+    double[] arrLow = new double[lows.size()];
+    double[] arrClose = new double[closes.size()];
+    for(int i = 0 ; i < highs.size() ; i++ ){
+      arrHigh[i] = highs.get(i).doubleValue();
+    }
+    for(int i = 0 ; i < lows.size() ; i++ ){
+      arrLow[i] = lows.get(i).doubleValue();
+    }
+    for(int i = 0 ; i < closes.size() ; i++ ){
+      arrClose[i] = closes.get(i).doubleValue();
+    }
+    MInteger outBegIdx = new MInteger();
+    MInteger outNBElement = new MInteger();
+    double[] outReal = new double[arrHigh.length];
+    CoreAnnotated coreAnnotated = new CoreAnnotated();
+    coreAnnotated.cci(0,arrClose.length-1, arrHigh,arrLow,arrClose,period,outBegIdx,outNBElement,outReal);
+    List<BigDecimal> ccis = convertOutRealToList(outReal,outBegIdx.value,outNBElement.value);
+    return ccis;
+  }
+
+  public static Map<String,List<BigDecimal>> macd(
+    List<BigDecimal> closes,
+    int fast,
+    int slow,
+    int signal
+    ){
+    double[] arrClose = new double[closes.size()];
+    for(int i = 0 ; i < closes.size() ; i++ ){
+      arrClose[i] = closes.get(i).doubleValue();
+    }
+    double[] outMACD = new double[arrClose.length];
+    double[] outMACDSignal = new double[arrClose.length];
+    double[] outMACDHist = new double[arrClose.length];
+    CoreAnnotated coreAnnotated = new CoreAnnotated();
+    MInteger outBegIdx = new MInteger();
+    MInteger outNBElement = new MInteger();
+    coreAnnotated.macd(
+      0,
+      arrClose.length-1,
+      arrClose,
+      fast,
+      slow,
+      signal,
+      outBegIdx,
+      outNBElement,
+      outMACD,
+      outMACDSignal,
+      outMACDHist
+    );
+    List<BigDecimal> macd = convertOutRealToList(outMACD,outBegIdx.value,outNBElement.value);
+    List<BigDecimal> signals = convertOutRealToList(outMACDSignal,outBegIdx.value,outNBElement.value);
+    List<BigDecimal> hist = convertOutRealToList(outMACDHist,outBegIdx.value,outNBElement.value);
+    Map<String, List<BigDecimal>> map = new HashMap<>();
+    map.put("macd",macd);
+    map.put("signal",signals);
+    map.put("hist",hist);
+    return map;
+
+
+  }
+
+
+
+
 }

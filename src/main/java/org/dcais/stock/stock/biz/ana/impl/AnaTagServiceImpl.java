@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,15 +51,15 @@ public class AnaTagServiceImpl implements AnaTagService {
 
 
   public String[] getSmaPeriods(){
-    return new String[]{"8", "17", "25", "50","100", "150","200"};
+    return new String[]{"5","8", "17", "25", "50","100", "150","200","145","320"};
   }
 
   @Override
-  public void ana(String tsCode){
+  public Map ana(String tsCode){
     Basic stock = basicService.getByTsCode(tsCode);
     Calendar ca = Calendar.getInstance();
     ca.setTime(DateUtils.getStartTimeDate(new Date()));
-    ca.add(Calendar.MONTH,-12);
+    ca.add(Calendar.MONTH,-18);
     Date gteDate = ca.getTime();
     DataFrame df = this.getDataFrame(tsCode,gteDate,null);
     List<TecMa> list = null;
@@ -83,6 +84,10 @@ public class AnaTagServiceImpl implements AnaTagService {
     anaResult.put(AnaCons.ANA_CONS_LOW, df.get(df.length()-1,"low"));
     anaResult.put(AnaCons.ANA_CONS_CLOSE, df.get(df.length()-1,"close"));
     anaResult.put(AnaCons.ANA_CONS_SAR, df.get(df.length()-1,"sar"));
+    anaResult.put(AnaCons.ANA_CONS_CCI, df.get(df.length()-1,"cci"));
+    anaResult.put(AnaCons.ANA_CONS_MACD, df.get(df.length()-1,"macd"));
+    anaResult.put(AnaCons.ANA_CONS_MACDSIGNAL, df.get(df.length()-1,"macdSignal"));
+    anaResult.put(AnaCons.ANA_CONS_MACDHIST, df.get(df.length()-1,"macdHist"));
 
     Boolean rSigToday = isBigDecimalOver(df,df.length()-1,"sar", df.length()-1, "close");
     Boolean rSigYestorday = isBigDecimalOver(df,df.length()-2,"sar", df.length()-2, "close");
@@ -140,7 +145,19 @@ public class AnaTagServiceImpl implements AnaTagService {
         anaResult.put(deadKey,getMark(Boolean.FALSE));
       }
     }
+
     xAnaTagDao.save(tsCode,tradeDate,anaResult);
+
+    BigDecimal lastClose = (BigDecimal) df.get(df.length()-1,"close");
+    BigDecimal last50Close = (BigDecimal) df.get(df.length() - 50 , "close");
+    BigDecimal diff = MathUtil.subtract(lastClose,last50Close);
+    BigDecimal rate50 = diff.divide(last50Close,6, RoundingMode.DOWN);
+    Map<String,Object> item = new HashMap<>();
+
+    item.put("tsCode",tsCode);
+    item.put("rate50",rate50);
+    item.put("tradeDate",tradeDate);
+    return item;
   }
 
   public Boolean isBigDecimalOver(DataFrame df, int row1,String col1, int row2,String col2){
@@ -173,11 +190,22 @@ public class AnaTagServiceImpl implements AnaTagService {
       df.add(columnName,mas);
     }
 
+    List<BigDecimal> closes =  df.col("close");
+    List<BigDecimal> highs=  df.col("high");
+    List<BigDecimal> lows=  df.col("low");
 
-    List<BigDecimal> highs =  df.col("high");
-    List<BigDecimal> lows =  df.col("low");
-    List<BigDecimal> sars = TalibUtil.sar(highs,lows,0.1d,2d);
-    df.add("sar",sars);
+    List<BigDecimal> CCI = TalibUtil.CCI(highs,lows,closes,14);
+    df.add("CCI",CCI);
+
+
+    Map<String,List<BigDecimal>> mapMACD = TalibUtil.macd(closes,12,26,9);
+    List<BigDecimal> macd = mapMACD.get("macd");
+    List<BigDecimal> macdSignal = mapMACD.get("signal");
+    List<BigDecimal> macdHist = mapMACD.get("hist");
+
+    df.add("macd",macd);
+    df.add("macdSignal",macdSignal);
+    df.add("macdHist",macdHist);
 
     return  df;
   }
@@ -214,35 +242,18 @@ public class AnaTagServiceImpl implements AnaTagService {
 
 
   @Override
-  public void anaRS50(Date tradeDate){
-    List<Basic> allBasics = basicService.getAllList();
-    List<Map<String,Object>> rates = new ArrayList<>();
-    for(Basic basic : allBasics) {
-      String tsCode =basic.getTsCode();
-      Calendar ca = Calendar.getInstance();
-      ca.setTime(DateUtils.getStartTimeDate(new Date()));
-      ca.add(Calendar.MONTH,-4);
-      Date gteDate = ca.getTime();
-      DataFrame df = this.getDataFrame(tsCode,gteDate, tradeDate);
-      if(df.length()< 50){
-        continue;
-      }
-      Date tradeDateInDf = (Date) df.get(df.length()-1,"tradeDate");
-      BigDecimal rate = new BigDecimal(-1000000);
-      if(DateUtils.formatDate(tradeDateInDf,DateUtils.YMD).equals(DateUtils.formatDate(tradeDate,DateUtils.YMD))){
-        BigDecimal lastClose = (BigDecimal) df.get(df.length()-1,"close");
-        BigDecimal last50Close = (BigDecimal) df.get(df.length() - 50 , "close");
-        rate = MathUtil.subtract(lastClose,last50Close).divide(last50Close);
-      }
-      Map<String,Object> item = new HashMap<>();
-
-      item.put("tsCode",tsCode);
-      item.put("rate",rate);
-      rates.add(item);
-    }
-    List<Map<String,Object>> sortedRates = rates.stream().sorted((l,r)-> {
-      BigDecimal left = (BigDecimal) l.get("rate");
-      BigDecimal right = (BigDecimal) r.get("rate");
+  public void anaCompare(Date tradeDate, List<Map> items) {
+    List<Map> itemsTradeDay = items.stream().filter(item -> {
+      Date itemTradeDate = (Date) item.get("tradeDate");
+      return (DateUtils.formatDate(itemTradeDate, DateUtils.YMD).equals(DateUtils.formatDate(tradeDate, DateUtils.YMD)));
+    }).collect(Collectors.toList());
+    this.anaRS50(tradeDate,itemsTradeDay);
+  }
+  @Override
+  public void anaRS50(Date tradeDate, List<Map> items){
+    List<Map> sortedRates = items.stream().sorted((l,r)-> {
+      BigDecimal left = (BigDecimal) l.get("rate50");
+      BigDecimal right = (BigDecimal) r.get("rate50");
       return left.compareTo(right);
     }).collect(Collectors.toList());
 
@@ -250,8 +261,8 @@ public class AnaTagServiceImpl implements AnaTagService {
     for(int i = 0 ; i< sortedRates.size() ; i ++ ){
       Map<String,Object> item = sortedRates.get(i);
       BigDecimal rs = MathUtil.divide(new BigDecimal(i).multiply(new BigDecimal(100)),new BigDecimal(size));
-      item.put("RS",rs);
-      xAnaTagDao.modify((String) item.get("tsCode"),tradeDate, "RS",rs);
+      item.put("RS50",rs);
+      xAnaTagDao.modify((String) item.get("tsCode"),tradeDate, "RS50",rs);
     }
 
   }

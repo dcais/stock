@@ -1,30 +1,23 @@
-package org.dcais.stock.stock.biz.ana;
+package org.dcais.stock.stock.task;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.basic.TradeCalService;
-import org.dcais.stock.stock.biz.tec.MAService;
+import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.Date;
-
-@ActiveProfiles("dev")
+@ActiveProfiles("prd")
 @SpringBootTest
 @Slf4j
-@Test
-public class AnaTagServiceTest extends AbstractTestNGSpringContextTests {
+public class AnaTaskTest extends AbstractTestNGSpringContextTests {
   @Autowired
-  private AnaTagService anaTagService;
+  AnaTagTask anaTagTask;
 
   @Test
   public void test(){
-    anaTagService.ana("000001.SZ");
-
+    anaTagTask.startCalc();
   }
-
 
 }

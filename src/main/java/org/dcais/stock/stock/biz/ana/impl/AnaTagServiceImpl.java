@@ -207,6 +207,8 @@ public class AnaTagServiceImpl implements AnaTagService {
     df.add("macdSignal",macdSignal);
     df.add("macdHist",macdHist);
 
+    List<BigDecimal> sars = TalibUtil.sar(highs,lows,0.1d,2d);
+    df.add("sar",sars);
     return  df;
   }
 

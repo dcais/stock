@@ -195,7 +195,7 @@ public class AnaTagServiceImpl implements AnaTagService {
     List<BigDecimal> lows=  df.col("low");
 
     List<BigDecimal> CCI = TalibUtil.CCI(highs,lows,closes,14);
-    df.add("CCI",CCI);
+    df.add("cci",CCI);
 
 
     Map<String,List<BigDecimal>> mapMACD = TalibUtil.macd(closes,12,26,9);

@@ -23,7 +23,7 @@ public class AnaTagTask {
   @Autowired
   private TradeCalService tradeCalService;
 
-  public void startCalc(){
+  public void startCalc(Date tradeDate){
     log.info("AnaTagTask Start");
 
     List<Basic> list = basicService.getAllList();
@@ -36,7 +36,7 @@ public class AnaTagTask {
         public Map call() {
           log.info("AnaTagTask on [tsCode]" + basic.getTsCode());
           try {
-            Map r = anaTagService.ana(basic.getTsCode());
+            Map r = anaTagService.ana(basic.getTsCode(),tradeDate);
             return r;
           } catch (Exception e) {
             return null;

@@ -101,7 +101,7 @@ public class StockController {
 //      log.error("",e);
 //    }
 
-    anaTagTask.startCalc();
+    anaTagTask.startCalc(null);
     conceptService.sync();
     conceptDetailService.sync();
 

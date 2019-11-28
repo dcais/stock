@@ -3,6 +3,7 @@ package org.dcais.stock.stock.biz;
 import org.dcais.stock.stock.dao.mybatis.BaseDao;
 import org.dcais.stock.stock.entity.BaseEntity;
 import org.dcais.stock.stock.entity.IdEntity;
+import org.dcais.stock.stock.entity.basic.FutExchange;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

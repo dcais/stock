@@ -55,13 +55,13 @@ public class AnaTagServiceImpl implements AnaTagService {
   }
 
   @Override
-  public Map ana(String tsCode){
+  public Map ana(String tsCode,Date lteDate ){
     Basic stock = basicService.getByTsCode(tsCode);
     Calendar ca = Calendar.getInstance();
     ca.setTime(DateUtils.getStartTimeDate(new Date()));
     ca.add(Calendar.MONTH,-18);
     Date gteDate = ca.getTime();
-    DataFrame df = this.getDataFrame(tsCode,gteDate,null);
+    DataFrame df = this.getDataFrame(tsCode,gteDate,lteDate);
     List<TecMa> list = null;
     List<BigDecimal> ma = null;
 

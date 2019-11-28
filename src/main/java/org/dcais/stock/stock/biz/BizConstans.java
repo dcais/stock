@@ -8,5 +8,6 @@ public class BizConstans {
 
   public static final String EXCHANGE_SSE = "SSE"; //上交所
   public static final String EXCHANGE_SZSE = "SZSE"; //深交所
+
 }
 

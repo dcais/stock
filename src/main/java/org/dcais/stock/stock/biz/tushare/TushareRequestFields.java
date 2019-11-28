@@ -302,4 +302,24 @@ public class TushareRequestFields {
     "rd_exp",
     "update_flag"
   };
+
+  public static String [] fut_basic = {
+    "ts_code",
+    "symbol",
+    "exchange",
+    "name",
+    "fut_code",
+    "multiplier",
+    "trade_unit",
+    "per_unit",
+    "quote_unit",
+    "quote_unit_desc",
+    "d_mode_desc",
+    "list_date",
+    "delist_date",
+    "d_month",
+    "last_ddate",
+    "trade_time_desc",
+  };
+
 }

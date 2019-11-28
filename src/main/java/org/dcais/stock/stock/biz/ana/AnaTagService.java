@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface AnaTagService {
-  Map ana(String tsCode);
+  Map ana(String tsCode,Date tradeDate);
 
   void anaCompare(Date tradeDate, List<Map> items);
 

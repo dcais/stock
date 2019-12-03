@@ -51,7 +51,7 @@ public class AnaTagServiceImpl implements AnaTagService {
 
 
   public String[] getSmaPeriods(){
-    return new String[]{"5","8", "17", "25", "50","100", "150","200","145","320"};
+    return new String[]{"5","8", "17", "25", "50","100", "150","200","145","320","730"};
   }
 
   @Override
@@ -59,7 +59,7 @@ public class AnaTagServiceImpl implements AnaTagService {
     Basic stock = basicService.getByTsCode(tsCode);
     Calendar ca = Calendar.getInstance();
     ca.setTime(DateUtils.getStartTimeDate(new Date()));
-    ca.add(Calendar.MONTH,-18);
+    ca.add(Calendar.YEAR,-4);
     Date gteDate = ca.getTime();
     DataFrame df = this.getDataFrame(tsCode,gteDate,lteDate);
     List<TecMa> list = null;

@@ -38,7 +38,7 @@ public class StockInfoService {
 
   @PostConstruct
   private void init() {
-    rateLimiter = RateLimiter.create(3);
+    rateLimiter = RateLimiter.create(50);
   }
 
   public Result stockBasicInfo(String listStatus) {

@@ -28,7 +28,7 @@ public class ConceptInfoService extends StockInfoService{
 
   @PostConstruct
   private void init() {
-    rateLimiter = RateLimiter.create(1);
+    rateLimiter = RateLimiter.create(50);
   }
 
   public Result concept() {

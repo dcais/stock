@@ -33,7 +33,7 @@ import java.util.Map;
 public class FutureInfoService extends BaseTushareInfoService {
   @PostConstruct
   private void init() {
-    rateLimiter = RateLimiter.create(3);
+    rateLimiter = RateLimiter.create(50);
   }
 
   public Result futBasic(String exchange){

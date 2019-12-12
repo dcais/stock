@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import org.dcais.stock.stock.biz.tushare.parser.TushareDataParser;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.DateUtils;
+import org.dcais.stock.stock.common.utils.StringUtil;
 import org.dcais.stock.stock.entity.info.FinIncome;
 import org.dcais.stock.stock.entity.info.FinIndicator;
 import org.dcais.stock.stock.http.tushare.param.TushareParam;
@@ -23,10 +24,10 @@ public class FinInfoService extends StockInfoService {
 
   @Autowired
   private TushareParamGem tushareParamGem;
-
+  
   @PostConstruct
   private void init() {
-    rateLimiter = RateLimiter.create(1);
+    rateLimiter = RateLimiter.create(50);
   }
 
   @Override
@@ -52,9 +53,11 @@ public class FinInfoService extends StockInfoService {
   }
 
   public Result finIndicator(String tsCode, Date startDate) {
-    TushareParam tushareParam = tushareParamGem.getParam("fina_indicator");
+    TushareParam tushareParam = tushareParamGem.getParam("fina_indicator_vip");
     Map<String, Object> param = new HashMap<>();
-    param.put("ts_code", tsCode);
+    if(StringUtil.isNotBlank(tsCode)){
+      param.put("ts_code", tsCode);
+    }
     if( startDate != null ){
       param.put("start_date", DateUtils.formatDate(startDate,DateUtils.YMD));
     }

@@ -29,4 +29,6 @@ public interface AnaCons {
   String ANA_CONS_CCI="cci";
 
   String ANA_CONS_SAR_SIGNAL="sarSignal";
+
+  String ANA_CONS_VOLUMN_RATIO = "volumeRatio";
 }

@@ -89,6 +89,12 @@ public class AnaTagServiceImpl implements AnaTagService {
     anaResult.put(AnaCons.ANA_CONS_MACDSIGNAL, df.get(df.length()-1,"macdSignal"));
     anaResult.put(AnaCons.ANA_CONS_MACDHIST, df.get(df.length()-1,"macdHist"));
 
+    Long volumeToday = (Long) df.get(df.length()-1, "vol");
+    Long volumeYesterday = (Long) df.get(df.length()-2, "vol");
+
+    Double volRatio = (double)volumeToday/(double)volumeYesterday;
+    anaResult.put(AnaCons.ANA_CONS_VOLUMN_RATIO,volRatio);
+
     Boolean rSigToday = isBigDecimalOver(df,df.length()-1,"sar", df.length()-1, "close");
     Boolean rSigYestorday = isBigDecimalOver(df,df.length()-2,"sar", df.length()-2, "close");
 

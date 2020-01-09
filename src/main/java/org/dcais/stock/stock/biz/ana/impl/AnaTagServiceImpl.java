@@ -51,7 +51,7 @@ public class AnaTagServiceImpl implements AnaTagService {
 
 
   public String[] getSmaPeriods(){
-    return new String[]{"5","8", "17", "25", "50","100", "150","200","145","320","730"};
+    return new String[]{"5","8","16","17", "25", "50","100", "150","200","145","320","730"};
   }
 
   @Override
@@ -116,7 +116,7 @@ public class AnaTagServiceImpl implements AnaTagService {
       anaResult.put(key,getMark(res));
     }
 
-    String[][] crossPeriods = {{"8","17"},{"8","25"},{"17","25"},{"25","50"},{"50","150"},{"150","200"}};
+    String[][] crossPeriods = {{"8","17"},{"8","16"},{"8","25"},{"17","25"},{"25","50"},{"50","150"},{"150","200"}};
 
     for(String[] periods: crossPeriods){
       String shortP = periods[0];

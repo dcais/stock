@@ -217,7 +217,7 @@ public class AnaTagServiceImpl implements AnaTagService {
     for(String period : getVolPeriods()){
       String columnName = "vol"+period;
       List<Long> vols =  df.col("vol");
-      List<BigDecimal> bigVols = vols.stream().map(t-> {return new BigDecimal(t);}).collect(Collectors.toList());
+      List<BigDecimal> bigVols = vols.stream().map(BigDecimal::new).collect(Collectors.toList());
       List<BigDecimal> mas= TalibUtil.movingAverage(bigVols,MAType.Sma,Integer.valueOf(period));
       df.add(columnName,mas);
     }

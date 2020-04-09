@@ -53,6 +53,9 @@ public class AnaTagServiceImpl implements AnaTagService {
   public String[] getSmaPeriods(){
     return new String[]{"5","8","16","17", "25", "50","100", "150","200","145","320","730"};
   }
+  public String[] getVolPeriods(){
+    return new String[]{"5","10", "24"};
+  }
 
   @Override
   public Map ana(String tsCode,Date lteDate ){
@@ -92,8 +95,19 @@ public class AnaTagServiceImpl implements AnaTagService {
     Long volumeToday = (Long) df.get(df.length()-1, "vol");
     Long volumeYesterday = (Long) df.get(df.length()-2, "vol");
 
-    Double volRatio = (double)volumeToday/(double)volumeYesterday;
-    anaResult.put(AnaCons.ANA_CONS_VOLUMN_RATIO,volRatio);
+    {
+      Double volRatio = (double)volumeToday/(double)volumeYesterday;
+      anaResult.put(AnaCons.ANA_CONS_VOLUMN_RATIO,volRatio);
+    }
+
+    for(String period : getVolPeriods()){
+      String columnName = "vol"+period;
+      String key = AnaCons.ANA_CONS_VOLUMN_RATIO+ period;
+      BigDecimal volumeMA = (BigDecimal) df.get(df.length()-1, columnName);
+      Double volRatio = (double)volumeToday/volumeMA.doubleValue();
+      anaResult.put(key,volRatio);
+    }
+
 
     Boolean rSigToday = isBigDecimalOver(df,df.length()-1,"sar", df.length()-1, "close");
     Boolean rSigYestorday = isBigDecimalOver(df,df.length()-2,"sar", df.length()-2, "close");
@@ -199,6 +213,14 @@ public class AnaTagServiceImpl implements AnaTagService {
     List<BigDecimal> closes =  df.col("close");
     List<BigDecimal> highs=  df.col("high");
     List<BigDecimal> lows=  df.col("low");
+
+    for(String period : getVolPeriods()){
+      String columnName = "vol"+period;
+      List<Long> vols =  df.col("vol");
+      List<BigDecimal> bigVols = vols.stream().map(t-> {return new BigDecimal(t)}).collect(Collectors.toList());
+      List<BigDecimal> mas= TalibUtil.movingAverage(bigVols,MAType.Sma,Integer.valueOf(period));
+      df.add(columnName,mas);
+    }
 
     List<BigDecimal> CCI = TalibUtil.CCI(highs,lows,closes,14);
     df.add("cci",CCI);

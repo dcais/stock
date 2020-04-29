@@ -49,10 +49,8 @@ public class FinController {
   @RequestMapping(value = "/indicatorRate/calc", method = RequestMethod.GET)
   @ResponseBody
   public Result indicatorRateCalc(){
-    finService.calcFinIndicatorRate(2019,3);
-    finService.calcFinIndicatorRate(2019,2);
-    finService.calcFinIndicatorRate(2019,1);
-    for( int i = 2018; i > 1999 ; i-- ){
+    finService.calcFinIndicatorRate(2020,1);
+    for( int i = 2019; i > 1999 ; i-- ){
       for( int j = 4 ; j > 0 ; j-- ){
         finService.calcFinIndicatorRate(i,j);
       }

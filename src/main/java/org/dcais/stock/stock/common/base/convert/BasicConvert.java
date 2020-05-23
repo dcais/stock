@@ -1,11 +1,9 @@
 package org.dcais.stock.stock.common.base.convert;
 
-import org.dcais.stock.stock.common.utils.ConvertUtil;
-import org.dcais.stock.stock.common.utils.DateUtils;
-import org.dcais.stock.stock.common.utils.MathUtil;
-import org.dcais.stock.stock.common.utils.StringUtil;
+import org.dcais.stock.stock.common.utils.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class BasicConvert extends AbstractConvert {
@@ -21,6 +19,10 @@ public class BasicConvert extends AbstractConvert {
     String returnValueStr = getReturnValueStr(returnValue);
     if (isAssignableFrom(targetFieldClass, Date.class)) {
       return DateUtils.smartFormat(returnValueStr);
+    }
+    if (isAssignableFrom(targetFieldClass, LocalDateTime.class)){
+      // todo:: localDateTime smart format
+      return LocalDateUtils.asLocalDateTime(DateUtils.smartFormat(returnValueStr));
     }
     return castNumStr(returnValueStr, targetFieldClass);
   }

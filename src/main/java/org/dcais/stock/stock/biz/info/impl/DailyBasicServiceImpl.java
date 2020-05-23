@@ -1,11 +1,11 @@
 package org.dcais.stock.stock.biz.info.impl;
 
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.BaseServiceImpl;
-import org.dcais.stock.stock.biz.basic.BasicService;
+import org.dcais.stock.stock.biz.BizConstans;
+import org.dcais.stock.stock.biz.basic.IBasicService;
 import org.dcais.stock.stock.biz.info.DailyBasicService;
-import org.dcais.stock.stock.biz.info.DailyService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.cons.MetaContants;
@@ -13,17 +13,20 @@ import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.CommonUtils;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
-import org.dcais.stock.stock.dao.mybatis.info.DailyDao;
+import org.dcais.stock.stock.common.utils.LocalDateUtils;
 import org.dcais.stock.stock.dao.xdriver.daily.XDailyBasicDao;
 import org.dcais.stock.stock.dao.xdriver.meta.XMetaCollDao;
 import org.dcais.stock.stock.entity.basic.Basic;
-import org.dcais.stock.stock.entity.info.Daily;
 import org.dcais.stock.stock.entity.info.DailyBasic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.sql.Wrapper;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 
 @Slf4j
@@ -33,7 +36,7 @@ public class DailyBasicServiceImpl implements DailyBasicService {
   @Autowired
   private XDailyBasicDao xDailyBasicDao;
   @Autowired
-  private BasicService basicService;
+  private IBasicService basicService;
   @Autowired
   private StockInfoService stockInfoService;
   @Value("${stock.batch-insert-size:1000}")
@@ -141,7 +144,7 @@ public class DailyBasicServiceImpl implements DailyBasicService {
       startDate = c.getTime();
     }
     if (startDate == null) {
-      startDate = basic.getListDate();
+      startDate = LocalDateUtils.asDate(basic.getListDate());
     }
 
     Date today = DateUtils.getStartTimeDate(new Date());

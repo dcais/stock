@@ -1,8 +1,7 @@
 package org.dcais.stock.stock.task;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.basic.BasicService;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
+import org.dcais.stock.stock.biz.basic.IBasicService;
 import org.dcais.stock.stock.biz.tec.MAService;
 import org.dcais.stock.stock.dao.xdriver.meta.XMetaCollDao;
 import org.dcais.stock.stock.entity.basic.Basic;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SMATask {
   @Autowired
-  private BasicService basicService;
+  private IBasicService basicService;
   @Autowired
   private MAService maService;
   @Autowired

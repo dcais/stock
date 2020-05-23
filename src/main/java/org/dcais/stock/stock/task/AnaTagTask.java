@@ -2,20 +2,23 @@ package org.dcais.stock.stock.task;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.ana.AnaTagService;
-import org.dcais.stock.stock.biz.basic.BasicService;
+import org.dcais.stock.stock.biz.basic.IBasicService;
 import org.dcais.stock.stock.biz.basic.TradeCalService;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 @Component
 @Slf4j
 public class AnaTagTask {
   @Autowired
-  private BasicService basicService;
+  private IBasicService basicService;
   @Autowired
   private AnaTagService anaTagService;
   @Autowired

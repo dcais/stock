@@ -1,9 +1,11 @@
 package org.dcais.stock.stock.biz.info.impl;
 
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.BaseServiceImpl;
-import org.dcais.stock.stock.biz.basic.BasicService;
+import org.dcais.stock.stock.biz.BizConstans;
+import org.dcais.stock.stock.biz.basic.IBasicService;
 import org.dcais.stock.stock.biz.info.AdjFactorService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
@@ -12,6 +14,7 @@ import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.CommonUtils;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
+import org.dcais.stock.stock.common.utils.LocalDateUtils;
 import org.dcais.stock.stock.dao.mybatis.info.AdjFactorDao;
 import org.dcais.stock.stock.dao.xdriver.meta.XMetaCollDao;
 import org.dcais.stock.stock.entity.basic.Basic;
@@ -31,7 +34,7 @@ public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorSe
   @Autowired
   private StockInfoService stockInfoService;
   @Autowired
-  private BasicService basicService;
+  private IBasicService basicService;
 
   @Value("${stock.batch-insert-size:1000}")
   private Integer batchInsertSize;
@@ -169,7 +172,7 @@ public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorSe
       startDate = c.getTime();
     }
     if (startDate == null) {
-      startDate = basic.getListDate();
+      startDate = LocalDateUtils.asDate(basic.getListDate());
     }
 
     Date today = DateUtils.getStartTimeDate(new Date());

@@ -1,7 +1,9 @@
 package org.dcais.stock.stock.controller.fin;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.basic.BasicService;
+import org.dcais.stock.stock.biz.BizConstans;
+import org.dcais.stock.stock.biz.basic.IBasicService;
 import org.dcais.stock.stock.biz.info.FinService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.entity.basic.Basic;
@@ -18,7 +20,7 @@ import java.util.List;
 @RestController
 public class FinController {
   @Autowired
-  private BasicService basicService;
+  private IBasicService basicService;
   @Autowired
   private FinService finService;
 

@@ -17,7 +17,7 @@ public class AnaTaskTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void test(){
-    anaTagTask.startCalc();
+    anaTagTask.startCalc(null);
   }
 
 }

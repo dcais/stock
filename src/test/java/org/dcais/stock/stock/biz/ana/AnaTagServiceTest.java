@@ -22,7 +22,7 @@ public class AnaTagServiceTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void test(){
-    anaTagService.ana("000001.SZ");
+    anaTagService.ana("000001.SZ",null);
 
   }
 

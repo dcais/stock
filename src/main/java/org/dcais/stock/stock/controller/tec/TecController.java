@@ -1,14 +1,8 @@
 package org.dcais.stock.stock.controller.tec;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.basic.BasicService;
-import org.dcais.stock.stock.biz.basic.TradeCalService;
-import org.dcais.stock.stock.biz.info.AdjFactorService;
-import org.dcais.stock.stock.biz.info.DailyService;
-import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.task.SMATask;
-import org.dcais.stock.stock.task.SplitAdjustTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

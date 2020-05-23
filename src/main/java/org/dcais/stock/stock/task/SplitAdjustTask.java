@@ -1,7 +1,7 @@
 package org.dcais.stock.stock.task;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.basic.BasicService;
+import org.dcais.stock.stock.biz.basic.IBasicService;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 public class SplitAdjustTask {
   @Autowired
-  private BasicService basicService;
+  private IBasicService basicService;
   @Autowired
   private ThreadPoolExecutor threadPoolExecutor;
   @Autowired

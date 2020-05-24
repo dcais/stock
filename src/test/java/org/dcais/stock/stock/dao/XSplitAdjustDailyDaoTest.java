@@ -12,6 +12,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ public class XSplitAdjustDailyDaoTest extends AbstractTestNGSpringContextTests {
     Date now = new Date();
     SplitAdjustedDaily splitAdjustedDaily = new SplitAdjustedDaily();
     splitAdjustedDaily.setTsCode("123546");
-    splitAdjustedDaily.setTradeDate(new Date());
+    splitAdjustedDaily.setTradeDate(LocalDateTime.now());
     splitAdjustedDaily.setOpen(new BigDecimal(12.34));
     List<SplitAdjustedDaily> list = new ArrayList<>();
     list.add(splitAdjustedDaily);

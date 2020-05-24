@@ -1,12 +1,14 @@
 package org.dcais.stock.stock.biz.info.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.AdjFactorService;
-import org.dcais.stock.stock.biz.info.DailyService;
+import org.dcais.stock.stock.biz.info.IDailyService;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.cons.StockMetaConstant;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.DateUtils;
+import org.dcais.stock.stock.common.utils.LocalDateUtils;
 import org.dcais.stock.stock.common.utils.MathUtil;
 import org.dcais.stock.stock.common.utils.StringUtil;
 import org.dcais.stock.stock.dao.xdriver.daily.XSplitAdjustedDailyDao;
@@ -19,7 +21,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.sql.Wrapper;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,7 +41,7 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
   @Value("${stock.batch-size:1000}")
   private Integer batchSize;
   @Autowired
-  DailyService dailyService;
+  IDailyService dailyService;
 
 
   @Override
@@ -59,7 +65,7 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
     params.put("tsCode",tsCode);
     params.put("isDeleted","N");
     if(splitAdjustedDaily != null){
-      Date tradeDate = splitAdjustedDaily.getTradeDate();
+      Date tradeDate = LocalDateUtils.asDate(splitAdjustedDaily.getTradeDate());
       params.put("gtTradeDate", tradeDate);
     }
     params.put("sort","tradeDate");
@@ -73,7 +79,13 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
     adjParams.put("sort","tradeDate");
 
     while(true){
-      List<Daily> dailyList = dailyService.select(params);
+      List<Daily> dailyList = dailyService.list(
+        Wrappers.<Daily>lambdaQuery()
+          .eq(Daily::getTsCode, tsCode)
+          .gt(Daily::getTradeDate, splitAdjustedDaily.getTradeDate())
+          .orderByAsc(Daily::getTradeDate)
+          .last("limit "+batchSize)
+      );
       if(dailyList.size() == 0 ){
         break;
       }
@@ -91,7 +103,7 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
 
       List<SplitAdjustedDaily> splits =
         dailyList.stream().map( t-> {
-          String key = DateUtils.dateFormat(t.getTradeDate(), DateUtils.YMD);
+          String key = LocalDateUtils.formatToStr(t.getTradeDate(), DateUtils.YMD);
           AdjFactor adjFactorDaily = mapAdjfactor.get(key);
           if(adjFactorDaily == null ){
             String errMsg = "can not find daily adj factor. [tsCode]" + t.getTsCode() +"[tradeDate]"+ key;

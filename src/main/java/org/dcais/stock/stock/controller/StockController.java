@@ -25,7 +25,7 @@ public class StockController {
   @Autowired
   private TradeCalService tradeCalService;
   @Autowired
-  private DailyService dailyService;
+  private IDailyService dailyService;
   @Autowired
   private AdjFactorService adjFactorService;
   @Autowired

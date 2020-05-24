@@ -1,7 +1,7 @@
 package org.dcais.stock.stock.controller.info;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.DailyService;
+import org.dcais.stock.stock.biz.info.IDailyService;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class DailyController {
   @Autowired
-  private DailyService dailyService;
+  private IDailyService dailyService;
   @Autowired
   private SplitAdjustService splitAdjustService;
 

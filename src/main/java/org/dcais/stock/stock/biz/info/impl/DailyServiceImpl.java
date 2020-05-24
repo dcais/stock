@@ -3,10 +3,9 @@ package org.dcais.stock.stock.biz.info.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.BaseServiceImpl;
-import org.dcais.stock.stock.biz.BizConstans;
+import org.dcais.stock.stock.biz.IBaseServiceImpl;
 import org.dcais.stock.stock.biz.basic.IBasicService;
-import org.dcais.stock.stock.biz.info.DailyService;
+import org.dcais.stock.stock.biz.info.IDailyService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.cons.MetaContants;
@@ -15,7 +14,7 @@ import org.dcais.stock.stock.common.utils.CommonUtils;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.common.utils.LocalDateUtils;
-import org.dcais.stock.stock.dao.mybatis.info.DailyDao;
+import org.dcais.stock.stock.dao.mybatisplus.info.DailyMapper;
 import org.dcais.stock.stock.dao.xdriver.meta.XMetaCollDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.Daily;
@@ -23,16 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.sql.Wrapper;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
 @Service
-public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
+public class DailyServiceImpl extends IBaseServiceImpl<DailyMapper, Daily> implements IDailyService {
 
-  @Autowired
-  private DailyDao dailyDao;
   @Autowired
   private IBasicService basicService;
   @Autowired
@@ -41,34 +38,8 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
   private Integer batchInsertSize;
   @Autowired
   private XMetaCollDao xMetaCollDao;
-
-  public List<Daily> getAll() {
-    return super.getAll(dailyDao);
-  }
-
-  public List<Daily> select(Map<String, Object> param) {
-    return dailyDao.select(param);
-  }
-
-  public Integer selectCount(Map<String, Object> param) {
-    return dailyDao.selectCount(param);
-  }
-
-  public Daily getById(Long id) {
-    return super.getById(dailyDao, id);
-  }
-
-  public boolean save(Daily daily) {
-    return super.save(dailyDao, daily);
-  }
-
-  public boolean deleteById(Long id) {
-    return super.deleteById(dailyDao, id);
-  }
-
-  public int deleteByIds(Long[] ids) {
-    return super.deleteByIds(dailyDao, ids);
-  }
+  @Autowired
+  private DailyMapper dailyMapper;
 
   @Override
   public void syncAll(String mode) {
@@ -85,7 +56,7 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
       calendar.setTime(minLastTradeDate);
       calendar.add(Calendar.DATE, 1);
       Date tradeDateStart = calendar.getTime();
-      dailyDao.deleteDateAfterDate(tradeDateStart);
+      dailyMapper.deleteDateAfterDate(tradeDateStart);
       this.syncHistryFromTradeDate(tradeDateStart);
     } else {
       throw new RuntimeException("unknown sync mode" + mode);
@@ -93,25 +64,7 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
   }
 
   public Result batchInsert(List<Daily> dailyList) {
-    List<List<Daily>> subList = ListUtil.getSubDepartList(dailyList, batchInsertSize);
-    if (ListUtil.isBlank(subList)) {
-      return Result.wrapSuccessfulResult("");
-    }
-    for (int i = subList.size() - 1; i >= 0; i--) {
-      List<Daily> dailies = subList.get(i);
-      if (ListUtil.isBlank(dailies)) {
-        continue;
-      }
-
-      List<Daily> tmps = new ArrayList<>(dailies.size());
-      for (int j = dailies.size() - 1; j >= 0; j--) {
-        Daily daily = dailies.get(j);
-        daily.setDefaultBizValue();
-        tmps.add(daily);
-      }
-
-      dailyDao.batchInsert(tmps);
-    }
+    this.saveBatch(dailyList,batchInsertSize);
     return Result.wrapSuccessfulResult("");
   }
 
@@ -148,6 +101,9 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
     }
     return r;
   }
+  List<Daily> getMaxDaily(String tsCode) {
+    return this.list(Wrappers.<Daily>lambdaQuery().eq(Daily::getTsCode,tsCode).orderByDesc(Daily::getTradeDate).last("limit 1"));
+  }
 
   @Override
   public Result syncHistory(String symbol) {
@@ -163,11 +119,11 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
   private Result syncHistory(Basic basic) {
     Daily dailyMaxInDb = null;
     Date startDate = null;
-    List<Daily> lastestDailys = dailyDao.getMaxDaily(basic.getTsCode());
+    List<Daily> lastestDailys = this.getMaxDaily(basic.getTsCode());
     if (ListUtil.isNotBlank(lastestDailys)) {
       dailyMaxInDb = lastestDailys.get(0);
       Calendar c = Calendar.getInstance();
-      c.setTime(dailyMaxInDb.getTradeDate());
+      c.setTime(LocalDateUtils.asDate(dailyMaxInDb.getTradeDate()));
       c.add(Calendar.DATE, 1);
       startDate = c.getTime();
     }
@@ -194,6 +150,9 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
       
       startDate = nextStartDate;
       List<Daily> dailyList = (List<Daily>) result.getData();
+      dailyList = dailyList.stream().sorted( ( p1,p2 )-> {
+        return p1.getTradeDate().compareTo(p2.getTradeDate());
+      } ).collect(Collectors.toList());
       this.batchInsert(dailyList);
     }
 
@@ -201,11 +160,9 @@ public class DailyServiceImpl extends BaseServiceImpl implements DailyService {
   }
 
   private void dealWithSync(Daily daily) {
-    Map<String, Object> param = new HashMap<>();
-    param.put("isDeleted", "N");
-    param.put("tsCode", daily.getTsCode());
-    param.put("tradeDate", DateUtils.formatDate(daily.getTradeDate(), DateUtils.Y_M_D));
-    List tmps = this.select(param);
+    List tmps = this.list(Wrappers.<Daily>lambdaQuery()
+      .eq(Daily::getTsCode,daily.getTsCode())
+      .eq(Daily::getTsCode,LocalDateUtils.formatToStr(daily.getTradeDate(), LocalDateUtils.Y_M_D)));
     if (ListUtil.isNotBlank(tmps)) {
       return;
     }

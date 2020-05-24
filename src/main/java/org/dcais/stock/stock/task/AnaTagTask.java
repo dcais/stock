@@ -3,7 +3,8 @@ package org.dcais.stock.stock.task;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.ana.AnaTagService;
 import org.dcais.stock.stock.biz.basic.IBasicService;
-import org.dcais.stock.stock.biz.basic.TradeCalService;
+import org.dcais.stock.stock.biz.basic.ITradeCalService;
+import org.dcais.stock.stock.common.utils.LocalDateUtils;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class AnaTagTask {
   @Autowired
   private ThreadPoolExecutor threadPoolExecutor;
   @Autowired
-  private TradeCalService tradeCalService;
+  private ITradeCalService tradeCalService;
 
   public void startCalc(Date tradeDate){
     log.info("AnaTagTask Start");
@@ -68,7 +69,7 @@ public class AnaTagTask {
       log.error("",e);
     }
 
-    Date lastTradeDate = tradeCalService.getLastTradeDate();
+    Date lastTradeDate = LocalDateUtils.asDate(tradeCalService.getLastTradeDate());
     anaTagService.anaCompare(lastTradeDate,items);
     log.info("AnaTagTask Done");
   }

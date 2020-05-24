@@ -7,10 +7,7 @@ import org.apache.tomcat.jni.Local;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -48,18 +45,30 @@ public class LocalDateUtils {
   public static final String YYYYMMDD = "yyyy年MM月dd日";
 
   public static Date asDate(LocalDate localDate) {
+    if(localDate == null){
+      return null;
+    }
     return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
   }
 
   public static Date asDate(LocalDateTime localDateTime) {
+    if(localDateTime == null){
+      return null;
+    }
     return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
   }
 
   public static LocalDate asLocalDate(Date date) {
+    if(date == null){
+      return null;
+    }
     return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
   }
 
   public static LocalDateTime asLocalDateTime(Date date) {
+    if(date == null){
+      return null;
+    }
     return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
   }
 
@@ -68,9 +77,9 @@ public class LocalDateUtils {
     if (localDateTime == null || format == null) {
       return null;
     }
-    LocalDateTime dt = LocalDateTime.now();
+    ZonedDateTime  zonedDateTime = ZonedDateTime.of(localDateTime,ZoneId.systemDefault());
     DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
-    return dt.format(fmt);
+    return zonedDateTime.format(fmt);
   }
 
   public static LocalDateTime formatToDate(String str, String format) {

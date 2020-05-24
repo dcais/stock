@@ -2,7 +2,7 @@ package org.dcais.stock.stock.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.basic.IBasicService;
-import org.dcais.stock.stock.biz.basic.TradeCalService;
+import org.dcais.stock.stock.biz.basic.ITradeCalService;
 import org.dcais.stock.stock.biz.info.*;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
@@ -23,7 +23,7 @@ public class StockController {
   @Autowired
   private IBasicService basicService;
   @Autowired
-  private TradeCalService tradeCalService;
+  private ITradeCalService tradeCalService;
   @Autowired
   private IDailyService dailyService;
   @Autowired

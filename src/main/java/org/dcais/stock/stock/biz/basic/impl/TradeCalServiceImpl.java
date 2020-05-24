@@ -1,82 +1,68 @@
 package org.dcais.stock.stock.biz.basic.impl;
 
 
-import java.util.*;
-import java.util.function.Function;
-
-import org.dcais.stock.stock.biz.BaseServiceImpl;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.dcais.stock.stock.biz.BizConstans;
-import org.dcais.stock.stock.biz.basic.TradeCalService;
+import org.dcais.stock.stock.biz.IBaseServiceImpl;
+import org.dcais.stock.stock.biz.basic.ITradeCalService;
 import org.dcais.stock.stock.biz.future.FutExchangeService;
-import org.dcais.stock.stock.biz.future.FutService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.result.Result;
+import org.dcais.stock.stock.common.utils.LocalDateUtils;
 import org.dcais.stock.stock.dao.mybatis.basic.TradeCalDao;
+import org.dcais.stock.stock.dao.mybatisplus.basic.TradeCalMapper;
 import org.dcais.stock.stock.entity.basic.FutExchange;
 import org.dcais.stock.stock.entity.basic.TradeCal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.sql.Wrapper;
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Service
-public class TradeCalServiceImpl extends BaseServiceImpl implements TradeCalService {
-
-  @Autowired
-  private TradeCalDao calDateDao;
+public class TradeCalServiceImpl extends IBaseServiceImpl<TradeCalMapper, TradeCal> implements ITradeCalService {
   @Autowired
   private StockInfoService stockInfoService;
   @Autowired
   private FutExchangeService futExchangeService;
 
-  public List<TradeCal> getAll() {
-    return super.getAll(calDateDao);
-  }
+  @Value("${stock.batch-insert-size:1000}")
+  private Integer batchInsertSize;
 
-  public List<TradeCal> select(Map<String, Object> param) {
-    return calDateDao.select(param);
-  }
-
-  public Integer selectCount(Map<String, Object> param) {
-    return calDateDao.selectCount(param);
-  }
-
-  public TradeCal getById(Long id) {
-    return super.getById(calDateDao, id);
-  }
-
-  public boolean save(TradeCal calDate) {
-    return super.save(calDateDao, calDate);
-  }
-
-  public boolean deleteById(Long id) {
-    return super.deleteById(calDateDao, id);
-  }
-
-  public int deleteByIds(Long[] ids) {
-    return super.deleteByIds(calDateDao, ids);
+  public LocalDateTime selectMaxCalDate(String exchange){
+    TradeCal tradeCal = this.getOne(Wrappers.<TradeCal>lambdaQuery().eq(TradeCal::getExchange, exchange).orderByDesc(TradeCal::getCalDate).last("limit 1"));
+    if(tradeCal == null ){
+      return null;
+    }
+    return tradeCal.getCalDate();
   }
 
   public void syncTradeCal(String exchange){
-    Date startDate = calDateDao.selectMaxCalDate(exchange);
-    Result r = stockInfoService.tradeCal(exchange, startDate, null);
+    LocalDateTime startDate = this.selectMaxCalDate(exchange);
+    Result r = stockInfoService.tradeCal(exchange, LocalDateUtils.asDate(startDate), null);
     if (!r.isSuccess()) {
       return ;
     }
 
     List<TradeCal> tradeCals = (List<TradeCal>) r.getData();
-    tradeCals.forEach(tradeCal -> {
-      Map<String, Object> params = new HashMap<>();
-      params.put("isDeleted", "N");
-      params.put("exchange", tradeCal.getExchange());
-      params.put("calDate", tradeCal.getCalDate());
 
-      List<TradeCal> tmps = calDateDao.select(params);
+    List<TradeCal> toSaveList = new LinkedList<>();
+    tradeCals.forEach(tradeCal -> {
+      List<TradeCal> tmps = this.list(Wrappers.<TradeCal>lambdaQuery()
+        .eq(TradeCal::getExchange, tradeCal.getExchange())
+        .eq(TradeCal::getCalDate, tradeCal.getCalDate())
+      );
       if (tmps.size() > 0) {
         return;
       }
-      this.save(tradeCal);
+      toSaveList.add(tradeCal);
     });
+    this.saveBatch(toSaveList,batchInsertSize);
   }
+
   @Override
   public Result sync() {
     String[] exchanges = {
@@ -92,9 +78,21 @@ public class TradeCalServiceImpl extends BaseServiceImpl implements TradeCalServ
     return Result.wrapSuccessfulResult("OK");
   }
 
+
   @Override
-  public Date getLastTradeDate(){
-    List<TradeCal> tradeCals = calDateDao.getLastTradeDate(BizConstans.EXCHANGE_SSE);
-    return tradeCals.get(0).getCalDate();
+  public LocalDateTime getLastTradeDate(){
+    String exchange = BizConstans.EXCHANGE_SSE;
+    TradeCal tradeCal = this.getOne(Wrappers.<TradeCal>lambdaQuery()
+      .eq(TradeCal::getExchange, exchange)
+      .eq(TradeCal::getIsOpen, 1)
+      .lt(TradeCal::getCalDate, LocalDateTime.now().minusHours(17))
+      .orderByDesc(TradeCal::getCalDate)
+      .last("limit 1")
+    );
+
+    if(tradeCal == null ){
+      return null;
+    }
+    return tradeCal.getCalDate();
   }
 }

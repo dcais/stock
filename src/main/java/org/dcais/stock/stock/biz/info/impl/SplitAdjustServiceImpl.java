@@ -2,7 +2,7 @@ package org.dcais.stock.stock.biz.info.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.AdjFactorService;
+import org.dcais.stock.stock.biz.info.IAdjFactorService;
 import org.dcais.stock.stock.biz.info.IDailyService;
 import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.common.cons.StockMetaConstant;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class SplitAdjustServiceImpl implements SplitAdjustService {
   @Autowired
-  private AdjFactorService adjFactorService;
+  private IAdjFactorService adjFactorService;
   @Autowired
   private XStockMetaDao xStockMetaDao;
   @Autowired
@@ -93,10 +93,14 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
       adjParams.put("lteTradeDate", daily.getTradeDate());
       params.put("gtTradeDate", daily.getTradeDate());
 
-      List<AdjFactor> adjFactors = adjFactorService.select(adjParams);
+      List<AdjFactor> adjFactors = adjFactorService.list(
+        Wrappers.<AdjFactor>lambdaQuery().le(AdjFactor::getTradeDate,daily.getTradeDate())
+        .gt(AdjFactor::getTradeDate,daily.getTradeDate())
+      );
+
       Map<String,AdjFactor> mapAdjfactor
         =  adjFactors.stream().collect(Collectors.toMap(
-          x-> DateUtils.dateFormat(x.getTradeDate(),DateUtils.YMD)
+          x-> DateUtils.dateFormat(LocalDateUtils.asDate(x.getTradeDate()),DateUtils.YMD)
         , Function.identity()
         , (oldV,newV) -> newV
       ));

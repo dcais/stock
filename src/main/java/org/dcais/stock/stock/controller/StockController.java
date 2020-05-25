@@ -27,7 +27,7 @@ public class StockController {
   @Autowired
   private IDailyService dailyService;
   @Autowired
-  private AdjFactorService adjFactorService;
+  private IAdjFactorService adjFactorService;
   @Autowired
   private SplitAdjustTask splitAdjustTask;
   @Autowired

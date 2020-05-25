@@ -1,7 +1,7 @@
 package org.dcais.stock.stock.controller.info;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.AdjFactorService;
+import org.dcais.stock.stock.biz.info.IAdjFactorService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.StringUtil;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AdjFactorController {
   @Autowired
-  private AdjFactorService adjFactorService;
+  private IAdjFactorService adjFactorService;
 
   @RequestMapping(value = "/syncBySymbol", method = RequestMethod.GET)
   @ResponseBody

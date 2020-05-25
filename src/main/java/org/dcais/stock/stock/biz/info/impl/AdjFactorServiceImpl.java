@@ -3,10 +3,9 @@ package org.dcais.stock.stock.biz.info.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.BaseServiceImpl;
-import org.dcais.stock.stock.biz.BizConstans;
+import org.dcais.stock.stock.biz.IBaseServiceImpl;
 import org.dcais.stock.stock.biz.basic.IBasicService;
-import org.dcais.stock.stock.biz.info.AdjFactorService;
+import org.dcais.stock.stock.biz.info.IAdjFactorService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.cons.MetaContants;
@@ -15,7 +14,7 @@ import org.dcais.stock.stock.common.utils.CommonUtils;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.common.utils.LocalDateUtils;
-import org.dcais.stock.stock.dao.mybatis.info.AdjFactorDao;
+import org.dcais.stock.stock.dao.mybatisplus.info.AdjFactorMapper;
 import org.dcais.stock.stock.dao.xdriver.meta.XMetaCollDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.AdjFactor;
@@ -23,52 +22,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.sql.Wrapper;
 import java.util.*;
 
 @Slf4j
 @Service
-public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorService {
+public class AdjFactorServiceImpl extends IBaseServiceImpl<AdjFactorMapper, AdjFactor> implements IAdjFactorService {
 
   @Autowired
-  private AdjFactorDao adjFactorDao;
+  private AdjFactorMapper adjFactorMapper;
   @Autowired
   private StockInfoService stockInfoService;
   @Autowired
   private IBasicService basicService;
-
-  @Value("${stock.batch-insert-size:1000}")
-  private Integer batchInsertSize;
-
   @Autowired
   private XMetaCollDao xMetaCollDao;
 
-  public List<AdjFactor> getAll() {
-    return super.getAll(adjFactorDao);
-  }
-
-  public List<AdjFactor> select(Map<String, Object> param) {
-    return adjFactorDao.select(param);
-  }
-
-  public Integer selectCount(Map<String, Object> param) {
-    return adjFactorDao.selectCount(param);
-  }
-
-  public AdjFactor getById(Long id) {
-    return super.getById(adjFactorDao, id);
-  }
-
-  public boolean save(AdjFactor adjFactor) {
-    return super.save(adjFactorDao, adjFactor);
-  }
-
-  public boolean deleteById(Long id) {
-    return super.deleteById(adjFactorDao, id);
-  }
-
-  public int deleteByIds(Long[] ids) {
-    return super.deleteByIds(adjFactorDao, ids);
-  }
+  @Value("${stock.batch-insert-size:1000}")
+  private Integer batchInsertSize;
 
 
   @Override
@@ -86,31 +57,13 @@ public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorSe
       calendar.setTime(minLastTradeDate);
       calendar.add(Calendar.DATE, 1);
       Date tradeDateStart = calendar.getTime();
-      adjFactorDao.deleteDateAfterDate(tradeDateStart);
+      adjFactorMapper.deleteDateAfterDate(tradeDateStart);
       this.syncHistryFromTradeDate(tradeDateStart);
     }
   }
 
   public Result batchInsert(List<AdjFactor> dailyList) {
-    List<List<AdjFactor>> subList = ListUtil.getSubDepartList(dailyList, batchInsertSize);
-    if (ListUtil.isBlank(subList)) {
-      return Result.wrapSuccessfulResult("");
-    }
-    for (int i = subList.size() - 1; i >= 0; i--) {
-      List<AdjFactor> dailies = subList.get(i);
-      if (ListUtil.isBlank(dailies)) {
-        continue;
-      }
-
-      List<AdjFactor> tmps = new ArrayList<>(dailies.size());
-      for (int j = dailies.size() - 1; j >= 0; j--) {
-        AdjFactor daily = dailies.get(j);
-        daily.setDefaultBizValue();
-        tmps.add(daily);
-      }
-
-      adjFactorDao.batchInsert(tmps);
-    }
+    this.saveBatch(dailyList,batchInsertSize);
     return Result.wrapSuccessfulResult("");
   }
 
@@ -163,11 +116,11 @@ public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorSe
   private Result syncHistory(Basic basic) {
     AdjFactor dailyMaxInDb = null;
     Date startDate = null;
-    List<AdjFactor> lastestFactors = adjFactorDao.getMaxDaily(basic.getTsCode());
-    if (ListUtil.isNotBlank(lastestFactors)) {
-      dailyMaxInDb = lastestFactors.get(0);
+    Result rTmp = this.getMaxDaily(basic.getTsCode());
+    if (rTmp.isSuccess()) {
+      dailyMaxInDb = (AdjFactor) rTmp.getData();
       Calendar c = Calendar.getInstance();
-      c.setTime(dailyMaxInDb.getTradeDate());
+      c.setTime(LocalDateUtils.asDate(dailyMaxInDb.getTradeDate()));
       c.add(Calendar.DATE, 1);
       startDate = c.getTime();
     }
@@ -201,10 +154,10 @@ public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorSe
 
   private void dealWithSync(AdjFactor factor) {
     Map<String, Object> param = new HashMap<>();
-    param.put("isDeleted", "N");
-    param.put("tsCode", factor.getTsCode());
-    param.put("tradeDate", DateUtils.formatDate(factor.getTradeDate(), DateUtils.Y_M_D));
-    List tmps = this.select(param);
+    List tmps = this.list(Wrappers.<AdjFactor>lambdaQuery()
+      .eq(AdjFactor::getTsCode, factor.getTsCode())
+      .eq(AdjFactor::getTradeDate, LocalDateUtils.formatToStr(factor.getTradeDate(),LocalDateUtils.Y_M_D))
+    );
     if (ListUtil.isNotBlank(tmps)) {
       return;
     }
@@ -213,9 +166,13 @@ public class AdjFactorServiceImpl extends BaseServiceImpl implements AdjFactorSe
 
   @Override
   public Result<AdjFactor> getMaxDaily(String tsCode){
-    List<AdjFactor> adjFactors = adjFactorDao.getMaxDaily(tsCode);
+    List<AdjFactor> adjFactors = this.list(Wrappers.<AdjFactor>lambdaQuery()
+      .eq(AdjFactor::getTsCode,tsCode)
+      .orderByDesc(AdjFactor::getTradeDate)
+      .last("limit 1")
+    );
     if(ListUtil.isBlank(adjFactors)){
-      Result.wrapErrorResult("","cannot find max adjFactor");
+      return Result.wrapErrorResult("","cannot find max adjFactor");
     }
     return Result.wrapSuccessfulResult(adjFactors.get(0));
   }

@@ -3,18 +3,17 @@ package org.dcais.stock.stock.biz.info.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.BizConstans;
+import org.dcais.stock.stock.biz.IBaseServiceImpl;
 import org.dcais.stock.stock.biz.basic.IBasicService;
-import org.dcais.stock.stock.biz.info.DailyBasicService;
+import org.dcais.stock.stock.biz.info.IDailyBasicService;
 import org.dcais.stock.stock.biz.tushare.StockInfoService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.cons.MetaContants;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.CommonUtils;
 import org.dcais.stock.stock.common.utils.DateUtils;
-import org.dcais.stock.stock.common.utils.ListUtil;
 import org.dcais.stock.stock.common.utils.LocalDateUtils;
-import org.dcais.stock.stock.dao.xdriver.daily.XDailyBasicDao;
+import org.dcais.stock.stock.dao.mybatisplus.info.DailyBasicMapper;
 import org.dcais.stock.stock.dao.xdriver.meta.XMetaCollDao;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.DailyBasic;
@@ -22,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.sql.Wrapper;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,10 +28,10 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class DailyBasicServiceImpl implements DailyBasicService {
+public class DailyBasicServiceImpl extends IBaseServiceImpl<DailyBasicMapper, DailyBasic> implements IDailyBasicService {
 
   @Autowired
-  private XDailyBasicDao xDailyBasicDao;
+  private DailyBasicMapper dailyBasicMapper;
   @Autowired
   private IBasicService basicService;
   @Autowired
@@ -59,7 +56,7 @@ public class DailyBasicServiceImpl implements DailyBasicService {
       calendar.setTime(minLastTradeDate);
       calendar.add(Calendar.DATE, 1);
       Date tradeDateStart = calendar.getTime();
-      xDailyBasicDao.deleteGte(tradeDateStart);
+      dailyBasicMapper.deleteDateAfterDate(tradeDateStart);
       this.syncHistryFromTradeDate(tradeDateStart);
     } else {
       throw new RuntimeException("unknown sync mode" + mode);
@@ -67,25 +64,7 @@ public class DailyBasicServiceImpl implements DailyBasicService {
   }
 
   public Result batchInsert(List<DailyBasic> dailyList) {
-    List<List<DailyBasic>> subList = ListUtil.getSubDepartList(dailyList, batchInsertSize);
-    if (ListUtil.isBlank(subList)) {
-      return Result.wrapSuccessfulResult("");
-    }
-    for (int i = subList.size() - 1; i >= 0; i--) {
-      List<DailyBasic> dailies = subList.get(i);
-      if (ListUtil.isBlank(dailies)) {
-        continue;
-      }
-
-      List<DailyBasic> tmps = new ArrayList<>(dailies.size());
-      for (int j = dailies.size() - 1; j >= 0; j--) {
-        DailyBasic daily = dailies.get(j);
-        daily.setDefaultBizValue();
-        tmps.add(daily);
-      }
-
-      xDailyBasicDao.insertList(tmps);
-    }
+    this.saveBatch(dailyList,batchInsertSize);
     return Result.wrapSuccessfulResult("");
   }
 
@@ -136,10 +115,14 @@ public class DailyBasicServiceImpl implements DailyBasicService {
 
   private Result syncHistory(Basic basic) {
     Date startDate = null;
-    DailyBasic dailyBasicLatest = xDailyBasicDao.getLatest(basic.getTsCode());
+    DailyBasic dailyBasicLatest = this.getOne(Wrappers.<DailyBasic>lambdaQuery()
+      .eq(DailyBasic::getTsCode,basic.getTsCode())
+      .orderByDesc(DailyBasic::getTradeDate)
+      .last("limit 1")
+    );
     if (dailyBasicLatest != null) {
       Calendar c = Calendar.getInstance();
-      c.setTime(dailyBasicLatest.getTradeDate());
+      c.setTime(LocalDateUtils.asDate(dailyBasicLatest.getTradeDate()));
       c.add(Calendar.DATE, 1);
       startDate = c.getTime();
     }

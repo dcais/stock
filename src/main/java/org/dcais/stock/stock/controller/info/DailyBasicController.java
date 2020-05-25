@@ -1,7 +1,7 @@
 package org.dcais.stock.stock.controller.info;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.DailyBasicService;
+import org.dcais.stock.stock.biz.info.IDailyBasicService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.StringUtil;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class DailyBasicController {
   @Autowired
-  private DailyBasicService dailyBasicService;
+  private IDailyBasicService dailyBasicService;
 
   @RequestMapping(value = "/syncBySymbol", method = RequestMethod.GET)
   @ResponseBody

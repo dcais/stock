@@ -37,7 +37,7 @@ public class StockController {
   @Autowired
   private AnaTagTask anaTagTask;
   @Autowired
-  private DailyBasicService dailyBasicService;
+  private IDailyBasicService dailyBasicService;
   @Autowired
   private ConceptDetailService conceptDetailService;
   @Autowired

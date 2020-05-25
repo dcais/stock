@@ -1,17 +1,19 @@
 package org.dcais.stock.stock.biz.info.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
+import org.dcais.stock.stock.biz.IBaseServiceImpl;
 import org.dcais.stock.stock.biz.info.IAdjFactorService;
 import org.dcais.stock.stock.biz.info.IDailyService;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
+import org.dcais.stock.stock.biz.info.ISplitAdjustedDailyService;
 import org.dcais.stock.stock.common.cons.StockMetaConstant;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.LocalDateUtils;
 import org.dcais.stock.stock.common.utils.MathUtil;
 import org.dcais.stock.stock.common.utils.StringUtil;
-import org.dcais.stock.stock.dao.xdriver.daily.XSplitAdjustedDailyDao;
+import org.dcais.stock.stock.dao.mybatisplus.info.SplitAdjustedDailyMapper;
 import org.dcais.stock.stock.dao.xdriver.meta.XStockMetaDao;
 import org.dcais.stock.stock.entity.info.AdjFactor;
 import org.dcais.stock.stock.entity.info.Daily;
@@ -21,9 +23,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.sql.Wrapper;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,13 +32,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class SplitAdjustServiceImpl implements SplitAdjustService {
+public class SplitAdjustServiceImpl extends IBaseServiceImpl<SplitAdjustedDailyMapper, SplitAdjustedDaily> implements ISplitAdjustedDailyService {
   @Autowired
   private IAdjFactorService adjFactorService;
   @Autowired
   private XStockMetaDao xStockMetaDao;
   @Autowired
-  private XSplitAdjustedDailyDao xSplitAdjustedDailyDao;
+  private SplitAdjustedDailyMapper splitAdjustedDailyMapper;
   @Value("${stock.batch-size:1000}")
   private Integer batchSize;
   @Autowired
@@ -56,46 +57,42 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
     }
     AdjFactor adjFactorLatest = rAdjFactorLatest.getData();
     if( isRecaculate(adjFactorLatest) || forceRemove){
-      xSplitAdjustedDailyDao.remove(tsCode);
+      splitAdjustedDailyMapper.delete(Wrappers.<SplitAdjustedDaily>lambdaQuery().eq(SplitAdjustedDaily::getTsCode,tsCode));
     }
 
-    SplitAdjustedDaily splitAdjustedDaily = xSplitAdjustedDailyDao.getLatest(tsCode);
+    SplitAdjustedDaily lastDaily= this.getOne(
+      Wrappers.<SplitAdjustedDaily>lambdaQuery()
+        .eq(SplitAdjustedDaily::getTsCode,tsCode)
+        .orderByDesc(SplitAdjustedDaily::getTradeDate)
+        .last("limit 1")
+    );
 
-    Map<String,Object> params = new HashMap<>();
-    params.put("tsCode",tsCode);
-    params.put("isDeleted","N");
-    if(splitAdjustedDaily != null){
-      Date tradeDate = LocalDateUtils.asDate(splitAdjustedDaily.getTradeDate());
-      params.put("gtTradeDate", tradeDate);
+    LocalDateTime lastTradeDate =  null;
+    if(lastDaily != null ){
+      lastTradeDate = lastDaily.getTradeDate();
     }
-    params.put("sort","tradeDate");
-    params.put("start",0);
-    params.put("pageSize",batchSize);
-
-    Map<String,Object> adjParams = new HashMap<>();
-    adjParams.put("tsCode",params.get("tsCode"));
-    adjParams.put("isDeleted","N");
-    adjParams.put("gtTradeDate", params.get("gtTradeDate"));
-    adjParams.put("sort","tradeDate");
 
     while(true){
-      List<Daily> dailyList = dailyService.list(
+      LambdaQueryWrapper<Daily> wrapper =
         Wrappers.<Daily>lambdaQuery()
-          .eq(Daily::getTsCode, tsCode)
-          .gt(Daily::getTradeDate, splitAdjustedDaily.getTradeDate())
-          .orderByAsc(Daily::getTradeDate)
-          .last("limit "+batchSize)
-      );
+          .eq(Daily::getTsCode, tsCode);
+
+      wrapper = wrapper.gt(lastTradeDate!= null,Daily::getTradeDate, lastTradeDate);
+      wrapper = wrapper.orderByAsc(Daily::getTradeDate);
+      wrapper.last("limit "+ batchSize);
+
+      List<Daily> dailyList = dailyService.list(wrapper);
       if(dailyList.size() == 0 ){
         break;
       }
       Daily daily = dailyList.get(dailyList.size()-1);
-      adjParams.put("lteTradeDate", daily.getTradeDate());
-      params.put("gtTradeDate", daily.getTradeDate());
+      lastTradeDate = daily.getTradeDate();
 
-      List<AdjFactor> adjFactors = adjFactorService.list(
-        Wrappers.<AdjFactor>lambdaQuery().le(AdjFactor::getTradeDate,daily.getTradeDate())
-        .gt(AdjFactor::getTradeDate,daily.getTradeDate())
+        List<AdjFactor> adjFactors = adjFactorService.list(
+        Wrappers.<AdjFactor>lambdaQuery()
+          .eq(AdjFactor::getTsCode,tsCode)
+          .le(false,AdjFactor::getTradeDate,daily.getTradeDate())
+          .ge(AdjFactor::getTradeDate,dailyList.get(0).getTradeDate())
       );
 
       Map<String,AdjFactor> mapAdjfactor
@@ -124,7 +121,7 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
         }).collect(Collectors.toList());
 
 
-      xSplitAdjustedDailyDao.insertList(splits);
+      this.saveBatch(splits);
     }
     saveLatestAdjFactorToStockMeta(adjFactorLatest);
     return Result.wrapSuccessfulResult("OK");
@@ -138,7 +135,13 @@ public class SplitAdjustServiceImpl implements SplitAdjustService {
     if(gteDate == null ){
       gteDate = DateUtils.smartFormat("1970-01-01");
     }
-    List<SplitAdjustedDaily> datas = this.xSplitAdjustedDailyDao.getFromDate(tsCode,gteDate,lteDate);
+    LambdaQueryWrapper<SplitAdjustedDaily> wrapper = Wrappers.<SplitAdjustedDaily>lambdaQuery().eq(SplitAdjustedDaily::getTsCode,tsCode)
+      .ge(SplitAdjustedDaily::getTradeDate,gteDate);
+    if(lteDate != null ){
+      wrapper = wrapper.le(SplitAdjustedDaily::getTradeDate,lteDate);
+    }
+
+    List<SplitAdjustedDaily> datas = this.list(wrapper);
     return Result.wrapSuccessfulResult(datas);
   }
 

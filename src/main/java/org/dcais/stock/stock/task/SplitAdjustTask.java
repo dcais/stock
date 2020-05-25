@@ -2,7 +2,7 @@ package org.dcais.stock.stock.task;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.basic.IBasicService;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
+import org.dcais.stock.stock.biz.info.ISplitAdjustedDailyService;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class SplitAdjustTask {
   @Autowired
   private ThreadPoolExecutor threadPoolExecutor;
   @Autowired
-  private SplitAdjustService splitAdjustService;
+  private ISplitAdjustedDailyService splitAdjustedDailyService;
 
   public void startCalc(){
     log.info("SplitAdjustTask Start");
@@ -32,7 +32,7 @@ public class SplitAdjustTask {
         public void run() {
           log.info( "SplitAdjustTask on [tsCode]"+ basic.getTsCode());
           try{
-            splitAdjustService.calcSplitAdjust(basic.getTsCode());
+            splitAdjustedDailyService.calcSplitAdjust(basic.getTsCode());
           }catch (Exception e){
           }finally {
             long count = latch.getCount();

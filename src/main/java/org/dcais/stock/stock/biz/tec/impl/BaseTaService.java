@@ -3,7 +3,7 @@ package org.dcais.stock.stock.biz.tec.impl;
 import joinery.DataFrame;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
+import org.dcais.stock.stock.biz.info.ISplitAdjustedDailyService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class BaseTaService {
   @Autowired
-  private SplitAdjustService splitAdjustService;
+  private ISplitAdjustedDailyService splitAdjustedDailyService;
   @Getter
   @Value("${stock.batch-insert-size:1000}")
   private Integer batchInsertSize;
@@ -43,7 +43,7 @@ public abstract class BaseTaService {
   }
 
   public DataFrame getDataFrame(String tsCode, Date gteDate) {
-    Result<List<SplitAdjustedDaily>> result  = splitAdjustService.getSplitAdjustDailyList(tsCode, gteDate,null);
+    Result<List<SplitAdjustedDaily>> result  = splitAdjustedDailyService.getSplitAdjustDailyList(tsCode, gteDate,null);
     if(!result.isSuccess()){
       log.error(result.getErrorMsg());
       return null;

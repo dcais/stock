@@ -5,12 +5,10 @@ import com.tictactec.ta.lib.MAType;
 import com.tictactec.ta.lib.MInteger;
 import joinery.DataFrame;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
-import org.dcais.stock.stock.biz.tec.MAService;
+import org.dcais.stock.stock.biz.info.ISplitAdjustedDailyService;
 import org.dcais.stock.stock.biz.tec.SARService;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
-import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
 import org.dcais.stock.stock.dao.xdriver.tec.XTecBaseDao;
 import org.dcais.stock.stock.dao.xdriver.tec.XTecSARDao;
 import org.dcais.stock.stock.entity.tec.TecMa;
@@ -18,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +24,7 @@ import java.util.List;
 @Slf4j
 public class SARServiceImpl extends BaseTaService implements SARService {
   @Autowired
-  private SplitAdjustService splitAdjustService;
+  private ISplitAdjustedDailyService splitAdjustedDailyService;
   @Autowired
   private XTecSARDao xTecSARDao;
 

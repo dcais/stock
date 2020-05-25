@@ -1,4 +1,4 @@
-package org.dcais.stock.stock.task;
+package org.dcais.stock.stock.biz.info;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,16 +7,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
-@ActiveProfiles("prd")
+@ActiveProfiles("dev")
 @SpringBootTest
 @Slf4j
-public class AnaTaskTest extends AbstractTestNGSpringContextTests {
+public class SpliteAdjustedDailyServiceTest extends AbstractTestNGSpringContextTests {
   @Autowired
-  AnaTagTask anaTagTask;
+  private ISplitAdjustedDailyService splitAdjustedDailyService;
 
   @Test
-  public void test(){
-    anaTagTask.startCalc(null);
+  public void testCalcSplitAdjustDaily(){
+    splitAdjustedDailyService.calcSplitAdjust("000001.SZ", true);
   }
-
 }

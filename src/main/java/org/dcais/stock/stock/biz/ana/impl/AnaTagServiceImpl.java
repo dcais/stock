@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.ana.AnaCons;
 import org.dcais.stock.stock.biz.ana.AnaTagService;
 import org.dcais.stock.stock.biz.basic.IBasicService;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
+import org.dcais.stock.stock.biz.info.ISplitAdjustedDailyService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.MathUtil;
@@ -33,7 +33,8 @@ public class AnaTagServiceImpl implements AnaTagService {
   @Autowired
   private IBasicService basicService;
   @Autowired
-  private SplitAdjustService splitAdjustService;
+  private ISplitAdjustedDailyService splitAdjustedDailyService;
+
   @Autowired
   private XSMADao xsmaDao;
   @Autowired
@@ -194,7 +195,7 @@ public class AnaTagServiceImpl implements AnaTagService {
 
 
   public DataFrame getDataFrame(String tsCode,Date gteDate, Date lteDate) {
-    Result<List<SplitAdjustedDaily>> result  = splitAdjustService.getSplitAdjustDailyList(tsCode, gteDate,lteDate);
+    Result<List<SplitAdjustedDaily>> result  = splitAdjustedDailyService.getSplitAdjustDailyList(tsCode, gteDate,lteDate);
     if(!result.isSuccess()){
       log.error(result.getErrorMsg());
       return null;

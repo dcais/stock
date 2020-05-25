@@ -2,7 +2,7 @@ package org.dcais.stock.stock.controller.info;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.IDailyService;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
+import org.dcais.stock.stock.biz.info.ISplitAdjustedDailyService;
 import org.dcais.stock.stock.common.cons.CmnConstants;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.StringUtil;
@@ -16,7 +16,7 @@ public class DailyController {
   @Autowired
   private IDailyService dailyService;
   @Autowired
-  private SplitAdjustService splitAdjustService;
+  private ISplitAdjustedDailyService splitAdjustedDailyService;
 
   @RequestMapping(value = "/syncBySymbol", method = RequestMethod.GET)
   @ResponseBody
@@ -37,6 +37,6 @@ public class DailyController {
   @RequestMapping(value = "/calcSplitAdjust", method = RequestMethod.GET)
   @ResponseBody
   public Result calcSplitAdjust(String tsCode,@RequestParam(defaultValue = "N") String isForce ){
-    return splitAdjustService.calcSplitAdjust(tsCode,"Y".equalsIgnoreCase(isForce));
+    return splitAdjustedDailyService.calcSplitAdjust(tsCode,"Y".equalsIgnoreCase(isForce));
   }
 }

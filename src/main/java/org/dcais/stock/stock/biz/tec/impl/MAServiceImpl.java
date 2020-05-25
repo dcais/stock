@@ -5,7 +5,6 @@ import com.tictactec.ta.lib.MAType;
 import com.tictactec.ta.lib.MInteger;
 import joinery.DataFrame;
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.SplitAdjustService;
 import org.dcais.stock.stock.biz.tec.MAService;
 import org.dcais.stock.stock.common.utils.DateUtils;
 import org.dcais.stock.stock.common.utils.ListUtil;
@@ -24,8 +23,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class MAServiceImpl extends BaseTaService implements MAService {
-  @Autowired
-  private SplitAdjustService splitAdjustService;
   @Autowired
   private XSMADao xsmaDao;
 

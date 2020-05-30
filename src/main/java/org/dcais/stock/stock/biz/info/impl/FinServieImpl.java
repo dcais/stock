@@ -1,7 +1,9 @@
 package org.dcais.stock.stock.biz.info.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.FinService;
+import org.dcais.stock.stock.biz.info.IFinIndicatorService;
 import org.dcais.stock.stock.biz.tushare.FinInfoService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.*;
@@ -18,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,13 +36,17 @@ public class FinServieImpl implements FinService {
   private XFinIndicatorDao xFinIndicatorDao;
   @Autowired
   private XFinIndicatorRateDao xFinIndicatorRateDao;
+
+  @Autowired
+  private IFinIndicatorService finIndicatorService;
+
   @Override
   public Result syncFinIncome(String tsCode) {
     log.info("sync fin income "+tsCode);
     Date startDate = null;
     FinIncome lastData = xFinIncomeDao.getLast(tsCode);
     if(lastData != null){
-      Date lastUpdate = DateUtils.smartFormat(lastData.getEndDate());
+      Date lastUpdate = LocalDateUtils.asDate(lastData.getEndDate());
       Calendar ca = Calendar.getInstance();
       ca.setTime(lastUpdate);
       ca.add(Calendar.DATE,1);
@@ -63,16 +70,18 @@ public class FinServieImpl implements FinService {
   @Override
   public Result syncFinIndicator(String tsCode) {
     log.info("sync fin indicator"+tsCode);
-//    xFinIndicatorDao.remove(tsCode);
-    FinIndicator lastData = xFinIndicatorDao.getLast(tsCode);
+    xFinIndicatorDao.remove(tsCode);
+    FinIndicator lastData = finIndicatorService.getOne(
+      Wrappers.<FinIndicator>lambdaQuery()
+        .eq(FinIndicator::getTsCode, tsCode)
+        .orderByDesc(FinIndicator::getReportYear,FinIndicator::getReportSeason)
+        .last("limit 1")
+    );
 
-    Date startDate = null;
+    LocalDateTime startDate = null;
     if(lastData != null){
-      Date lastUpdate = DateUtils.smartFormat(lastData.getEndDate());
-      Calendar ca = Calendar.getInstance();
-      ca.setTime(lastUpdate);
-      ca.add(Calendar.DATE,1);
-      startDate = ca.getTime();
+      LocalDateTime lastUpdate =  lastData.getEndDate();
+      startDate = lastUpdate.plusDays(1);
     }
 
     Result r = finInfoService.finIndicator(tsCode,startDate);
@@ -83,7 +92,7 @@ public class FinServieImpl implements FinService {
 
     List<FinIndicator> finIndicators= (List<FinIndicator>) r.getData();
     if( ListUtil.isBlank(finIndicators) == false ){
-      xFinIndicatorDao.insertList(finIndicators);
+      finIndicatorService.saveBatch(finIndicators);
     }
 
     return Result.wrapSuccessfulResult("");

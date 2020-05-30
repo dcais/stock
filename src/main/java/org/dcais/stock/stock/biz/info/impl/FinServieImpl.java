@@ -3,17 +3,16 @@ package org.dcais.stock.stock.biz.info.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.FinService;
+import org.dcais.stock.stock.biz.info.IFinIndicatorRateService;
 import org.dcais.stock.stock.biz.info.IFinIndicatorService;
 import org.dcais.stock.stock.biz.tushare.FinInfoService;
 import org.dcais.stock.stock.common.result.Result;
 import org.dcais.stock.stock.common.utils.*;
 import org.dcais.stock.stock.dao.xdriver.fin.XFinIncomeDao;
-import org.dcais.stock.stock.dao.xdriver.fin.XFinIndicatorDao;
-import org.dcais.stock.stock.dao.xdriver.fin.XFinIndicatorRateDao;
 import org.dcais.stock.stock.entity.info.FinIncome;
 import org.dcais.stock.stock.entity.info.FinIndicator;
+import org.dcais.stock.stock.entity.info.FinIndicatorRate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ZeroCopyHttpOutputMessage;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -23,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,15 +30,15 @@ import java.util.stream.Collectors;
 public class FinServieImpl implements FinService {
   @Autowired
   private FinInfoService finInfoService;
+
   @Autowired
   private XFinIncomeDao xFinIncomeDao;
-  @Autowired
-  private XFinIndicatorDao xFinIndicatorDao;
-  @Autowired
-  private XFinIndicatorRateDao xFinIndicatorRateDao;
 
   @Autowired
   private IFinIndicatorService finIndicatorService;
+
+  @Autowired
+  private IFinIndicatorRateService finIndicatorRateService;
 
   @Override
   public Result syncFinIncome(String tsCode) {
@@ -70,7 +70,7 @@ public class FinServieImpl implements FinService {
   @Override
   public Result syncFinIndicator(String tsCode) {
     log.info("sync fin indicator"+tsCode);
-    xFinIndicatorDao.remove(tsCode);
+//    xFinIndicatorDao.remove(tsCode);
     FinIndicator lastData = finIndicatorService.getOne(
       Wrappers.<FinIndicator>lambdaQuery()
         .eq(FinIndicator::getTsCode, tsCode)
@@ -98,9 +98,9 @@ public class FinServieImpl implements FinService {
     return Result.wrapSuccessfulResult("");
   }
 
-  public FinIndicator calcFinIndcatorRate(FinIndicator dataNow, FinIndicator dataLast){
+  public FinIndicatorRate calcFinIndicatorRate(FinIndicator dataNow, FinIndicator dataLast){
     List<Field> targetFields = ReflectUtils.getFieldList(FinIndicator.class);
-    FinIndicator dataRate = new FinIndicator();
+    FinIndicatorRate dataRate = new FinIndicatorRate();
 
     for( Field field : targetFields){
       Method setMethod = ReflectUtils.getSetMethod(field, dataRate);
@@ -144,20 +144,48 @@ public class FinServieImpl implements FinService {
 
   @Override
   public Result calcFinIndicatorRate(int reportYear, int reportSeason){
-    List<FinIndicator> finIndicators =xFinIndicatorDao.get(reportYear,reportSeason);
-    List<FinIndicator> finIndicatorsLastYear = xFinIndicatorDao.get(reportYear-1,reportSeason);
+    List<FinIndicator> finIndicators = finIndicatorService.list(Wrappers.<FinIndicator>lambdaQuery()
+    .eq(FinIndicator::getReportYear,reportYear).eq(FinIndicator::getReportSeason,reportSeason));
+
+    List<FinIndicator> finIndicatorsLastYear =  finIndicatorService.list(Wrappers.<FinIndicator>lambdaQuery()
+      .eq(FinIndicator::getReportYear,reportYear - 1).eq(FinIndicator::getReportSeason,reportSeason));
+
     Map<String,FinIndicator> mapLastYear = finIndicatorsLastYear.stream().collect(Collectors.toMap(FinIndicator::getTsCode, Function.identity(), (t1,t2)-> t1));
-    List<FinIndicator> rates = finIndicators.stream().map( dataNow->{
+
+    List<FinIndicatorRate> rates = finIndicators.stream().map(dataNow->{
       FinIndicator dataLast = mapLastYear.get(dataNow.getTsCode());
       if(dataLast == null){
         return null;
       }
-      FinIndicator dataRate = this.calcFinIndcatorRate(dataNow,dataLast);
+      FinIndicatorRate dataRate = this.calcFinIndicatorRate(dataNow,dataLast);
       return dataRate;
 
     }).filter( t-> t!=null).collect(Collectors.toList());
-    xFinIndicatorRateDao.remove(reportYear,reportSeason);
-    xFinIndicatorRateDao.insertList(rates);
+
+    List<FinIndicatorRate> rs = finIndicatorRateService.list(Wrappers.<FinIndicatorRate>lambdaQuery()
+      .eq(FinIndicator::getReportYear,reportYear).eq(FinIndicator::getReportSeason,reportSeason));
+
+    Function<FinIndicator,String> getFinIndicatorKey = t -> {
+      return String.format("%s_%d_%d", t.getTsCode(), t.getReportYear(), t.getReportSeason());
+    };
+
+    Map<String,FinIndicatorRate> mapOld = rs.stream().collect(
+      Collectors.toMap(
+        getFinIndicatorKey,
+        y-> y,
+        (newV, oldV) -> newV
+        )
+    );
+    for(FinIndicatorRate rate : rates) {
+      String key = getFinIndicatorKey.apply(rate);
+      FinIndicatorRate r = mapOld.get(key);
+      if(r== null ) {
+        continue;
+      }
+      rate.setId(r.getId());
+    }
+
+    finIndicatorRateService.saveOrUpdateBatch(rates);
     return Result.wrapSuccessfulResult("OK");
   }
 
@@ -176,8 +204,29 @@ public class FinServieImpl implements FinService {
   }
 
   public boolean checkFinIncrease(String tsCode, int reportYear, int reportSeason ){
-    FinIndicator finIndicatorRate = xFinIndicatorRateDao.get(tsCode,reportYear,reportSeason);
-    FinIndicator finIndicator = xFinIndicatorDao.get(tsCode,reportYear,reportSeason);
+    FinIndicatorRate finIndicatorRate = finIndicatorRateService.getOne(
+      Wrappers.<FinIndicatorRate>lambdaQuery().eq(
+        FinIndicatorRate::getTsCode,tsCode
+      ).eq(
+        FinIndicatorRate::getReportYear,reportYear
+      ).eq(
+        FinIndicatorRate::getReportYear,reportSeason
+      ).last(
+        "limit 1"
+      )
+    );
+    FinIndicator finIndicator = finIndicatorService.getOne(
+      Wrappers.<FinIndicator>lambdaQuery().eq(
+        FinIndicator::getTsCode,tsCode
+      ).eq(
+        FinIndicator::getReportYear,reportYear
+      ).eq(
+        FinIndicator::getReportYear,reportSeason
+      ).last(
+        "limit 1"
+      )
+    );
+
     if(finIndicator == null){
       return false;
     }
@@ -219,7 +268,9 @@ public class FinServieImpl implements FinService {
 
   @Override
   public Result getCANSLIMCandidates(int reportYear, int reportSeason){
-    List<FinIndicator> rateCurSeason = xFinIndicatorDao.get(reportYear,reportSeason);
+    List<FinIndicator> rateCurSeason = finIndicatorService.list(
+      Wrappers.<FinIndicator>lambdaQuery().eq(FinIndicator::getReportYear,reportYear).eq(FinIndicator::getReportSeason,reportSeason)
+    );
     List<String> tsCodes = rateCurSeason.stream()
 //      .filter(t->{ return t.getEps() != null && t.getEps().compareTo(BigDecimal.ONE) > 0; })
       .map(FinIndicator::getTsCode).collect(Collectors.toList());

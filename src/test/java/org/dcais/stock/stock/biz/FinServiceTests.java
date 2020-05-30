@@ -31,9 +31,9 @@ public class FinServiceTests extends AbstractTestNGSpringContextTests {
   public void syncFinIndicator() {
     Result r = finService.syncFinIndicator("000001.SZ");
   }
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void calcFinIndicatorRate(){
-    Result r = finService.calcFinIndicatorRate(1999,1);
+    Result r = finService.calcFinIndicatorRate(2019,1);
   }
 
   @Test(enabled = false)

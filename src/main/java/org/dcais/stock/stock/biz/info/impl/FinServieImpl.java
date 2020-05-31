@@ -3,6 +3,7 @@ package org.dcais.stock.stock.biz.info.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.dcais.stock.stock.biz.info.FinService;
+import org.dcais.stock.stock.biz.info.IFinIncomeService;
 import org.dcais.stock.stock.biz.info.IFinIndicatorRateService;
 import org.dcais.stock.stock.biz.info.IFinIndicatorService;
 import org.dcais.stock.stock.biz.tushare.FinInfoService;
@@ -32,7 +33,7 @@ public class FinServieImpl implements FinService {
   private FinInfoService finInfoService;
 
   @Autowired
-  private XFinIncomeDao xFinIncomeDao;
+  private IFinIncomeService finIncomeService;
 
   @Autowired
   private IFinIndicatorService finIndicatorService;
@@ -44,7 +45,12 @@ public class FinServieImpl implements FinService {
   public Result syncFinIncome(String tsCode) {
     log.info("sync fin income "+tsCode);
     Date startDate = null;
-    FinIncome lastData = xFinIncomeDao.getLast(tsCode);
+    FinIncome lastData = finIncomeService.getOne(
+      Wrappers.<FinIncome> lambdaQuery()
+        .eq(FinIncome::getTsCode, tsCode)
+        .orderByDesc(FinIncome::getReportYear, FinIncome::getReportSeason)
+        .last("limit 1")
+    );
     if(lastData != null){
       Date lastUpdate = LocalDateUtils.asDate(lastData.getEndDate());
       Calendar ca = Calendar.getInstance();
@@ -61,7 +67,7 @@ public class FinServieImpl implements FinService {
 
     List<FinIncome> finIncomes = (List<FinIncome>) r.getData();
     if(!ListUtil.isBlank(finIncomes)){
-      xFinIncomeDao.insertList(finIncomes);
+      finIncomeService.saveBatch(finIncomes);
     }
 
     return Result.wrapSuccessfulResult("");

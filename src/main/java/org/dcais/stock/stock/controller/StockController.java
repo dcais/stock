@@ -69,9 +69,9 @@ public class StockController {
   @ResponseBody
   public Result firstSync() {
     basicService.sync();
-    dailyService.syncAll(CmnConstants.SYNC_MODE_DATE);
-    adjFactorService.syncAll(CmnConstants.SYNC_MODE_DATE);
-    dailyBasicService.syncAll(CmnConstants.SYNC_MODE_DATE);
+    dailyService.syncAll(CmnConstants.SYNC_MODE_SYMBOL);
+    adjFactorService.syncAll(CmnConstants.SYNC_MODE_SYMBOL);
+    dailyBasicService.syncAll(CmnConstants.SYNC_MODE_SYMBOL);
     splitAdjustTask.startCalc();
     anaTagTask.startCalc(null);
     conceptService.sync();

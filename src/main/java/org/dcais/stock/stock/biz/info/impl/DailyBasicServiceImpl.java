@@ -96,7 +96,7 @@ public class DailyBasicServiceImpl extends IBaseServiceImpl<DailyBasicMapper, Da
     Result r = this.batchInsert(dailyList);
     if (r.isSuccess()) {
       if (dailyList.size() > 0) {
-        xMetaCollDao.put(MetaContants.META_KEY_DAILY_LAST_SYNC_DATE, tradeDate);
+        xMetaCollDao.put(MetaContants.META_KEY_DAILY_BASIC_LAST_SYNC_DATE, tradeDate);
       }
     }
     return r;

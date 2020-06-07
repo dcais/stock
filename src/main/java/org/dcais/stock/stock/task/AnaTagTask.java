@@ -1,16 +1,15 @@
 package org.dcais.stock.stock.task;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.ana.AnaTagService;
+import org.dcais.stock.stock.biz.ana.IDailyAnaTagService;
 import org.dcais.stock.stock.biz.basic.IBasicService;
 import org.dcais.stock.stock.biz.basic.ITradeCalService;
-import org.dcais.stock.stock.common.utils.LocalDateUtils;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -21,13 +20,13 @@ public class AnaTagTask {
   @Autowired
   private IBasicService basicService;
   @Autowired
-  private AnaTagService anaTagService;
+  private IDailyAnaTagService dailyAnaTagService;
   @Autowired
   private ThreadPoolExecutor threadPoolExecutor;
   @Autowired
   private ITradeCalService tradeCalService;
 
-  public void startCalc(Date tradeDate){
+  public void startCalc(LocalDateTime tradeDate){
     log.info("AnaTagTask Start");
 
     List<Basic> list = basicService.getAllList();
@@ -40,7 +39,7 @@ public class AnaTagTask {
         public Map call() {
           log.info("AnaTagTask on [tsCode]" + basic.getTsCode());
           try {
-            Map r = anaTagService.ana(basic.getTsCode(),tradeDate);
+            Map r = dailyAnaTagService.ana(basic.getTsCode(),tradeDate);
             return r;
           } catch (Exception e) {
             return null;
@@ -69,8 +68,8 @@ public class AnaTagTask {
       log.error("",e);
     }
 
-    Date lastTradeDate = LocalDateUtils.asDate(tradeCalService.getLastTradeDate());
-    anaTagService.anaCompare(lastTradeDate,items);
+    LocalDateTime lastTradeDate = tradeCalService.getLastTradeDate();
+    dailyAnaTagService.anaCompare(lastTradeDate,items);
     log.info("AnaTagTask Done");
   }
 }

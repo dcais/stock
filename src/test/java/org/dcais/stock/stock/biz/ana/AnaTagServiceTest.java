@@ -13,12 +13,11 @@ import org.testng.annotations.Test;
 @Test
 public class AnaTagServiceTest extends AbstractTestNGSpringContextTests {
   @Autowired
-  private AnaTagService anaTagService;
+  private IDailyAnaTagService dailyAnaTagService;
 
   @Test
   public void test(){
-    anaTagService.ana("000001.SZ",null);
-
+    dailyAnaTagService.ana("000001.SZ",null);
   }
 
 

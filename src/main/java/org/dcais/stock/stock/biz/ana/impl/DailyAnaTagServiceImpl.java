@@ -1,21 +1,19 @@
 package org.dcais.stock.stock.biz.ana.impl;
 
+
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.tictactec.ta.lib.CoreAnnotated;
 import com.tictactec.ta.lib.MAType;
 import joinery.DataFrame;
-import lombok.extern.slf4j.Slf4j;
+import org.dcais.stock.stock.biz.IBaseServiceImpl;
 import org.dcais.stock.stock.biz.ana.AnaCons;
-import org.dcais.stock.stock.biz.ana.AnaTagService;
+import org.dcais.stock.stock.biz.ana.IDailyAnaTagService;
 import org.dcais.stock.stock.biz.basic.IBasicService;
 import org.dcais.stock.stock.biz.info.ISplitAdjustedDailyService;
 import org.dcais.stock.stock.common.result.Result;
-import org.dcais.stock.stock.common.utils.DateUtils;
-import org.dcais.stock.stock.common.utils.MathUtil;
-import org.dcais.stock.stock.common.utils.StringUtil;
-import org.dcais.stock.stock.common.utils.TalibUtil;
-import org.dcais.stock.stock.dao.xdriver.ana.XAnaTagDao;
-import org.dcais.stock.stock.dao.xdriver.tec.XSMADao;
-import org.dcais.stock.stock.dao.xdriver.tec.XTecSARDao;
+import org.dcais.stock.stock.common.utils.*;
+import org.dcais.stock.stock.dao.mybatisplus.ana.DailyAnaTagMapper;
+import org.dcais.stock.stock.entity.ana.DailyAnaTag;
 import org.dcais.stock.stock.entity.basic.Basic;
 import org.dcais.stock.stock.entity.info.SplitAdjustedDaily;
 import org.dcais.stock.stock.entity.tec.TecMa;
@@ -24,23 +22,26 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
+/**
+ * <p>
+ * 分析打标 服务实现类
+ * </p>
+ *
+ * @author david-cai
+ * @since 2020-06-06
+ */
 @Service
-public class AnaTagServiceImpl implements AnaTagService {
+public class DailyAnaTagServiceImpl extends IBaseServiceImpl<DailyAnaTagMapper, DailyAnaTag> implements IDailyAnaTagService {
   @Autowired
   private IBasicService basicService;
   @Autowired
   private ISplitAdjustedDailyService splitAdjustedDailyService;
 
-  @Autowired
-  private XSMADao xsmaDao;
-  @Autowired
-  private XTecSARDao xTecSARDao;
-  @Autowired
-  private XAnaTagDao xAnaTagDao;
+
 
   String getMark(Boolean b){
     if(b == null){
@@ -58,21 +59,22 @@ public class AnaTagServiceImpl implements AnaTagService {
   }
 
   @Override
-  public Map ana(String tsCode,Date lteDate ){
+  public Map ana(String tsCode, LocalDateTime lteDate ){
     Basic stock = basicService.getByTsCode(tsCode);
-    Calendar ca = Calendar.getInstance();
-    ca.setTime(DateUtils.getStartTimeDate(new Date()));
-    ca.add(Calendar.YEAR,-4);
-    Date gteDate = ca.getTime();
+
+    LocalDateTime gteDate = LocalDateTime.now().minusYears(4);
     DataFrame df = this.getDataFrame(tsCode,gteDate,lteDate);
     List<TecMa> list = null;
     List<BigDecimal> ma = null;
 
     String[] smaTecPeriods= getSmaPeriods();
 
-    Date tradeDate = (Date) df.get(df.length()-1,"tradeDate");
+    LocalDateTime tradeDate = (LocalDateTime) df.get(df.length()-1,"tradeDate");
 
-    xAnaTagDao.remove(tsCode,tradeDate);
+    this.remove(Wrappers.<DailyAnaTag>lambdaQuery()
+      .eq(DailyAnaTag::getTsCode,tsCode)
+      .eq(DailyAnaTag::getTradeDate,tradeDate)
+    );
 
     Map<String,Object> anaResult = new HashMap<>();
     anaResult.put(AnaCons.ANA_CONS_TRADE_DATE,tradeDate);
@@ -92,8 +94,8 @@ public class AnaTagServiceImpl implements AnaTagService {
     anaResult.put(AnaCons.ANA_CONS_MACDSIGNAL, df.get(df.length()-1,"macdSignal"));
     anaResult.put(AnaCons.ANA_CONS_MACDHIST, df.get(df.length()-1,"macdHist"));
 
-    Long volumeToday = (Long) df.get(df.length()-1, "vol");
-    Long volumeYesterday = (Long) df.get(df.length()-2, "vol");
+    Integer volumeToday = (Integer) df.get(df.length()-1, "vol");
+    Integer volumeYesterday = (Integer) df.get(df.length()-2, "vol");
 
     {
       Double volRatio = (double)volumeToday/(double)volumeYesterday;
@@ -166,7 +168,7 @@ public class AnaTagServiceImpl implements AnaTagService {
       }
     }
 
-    xAnaTagDao.save(tsCode,tradeDate,anaResult);
+    this.saveAnaResult(tsCode,tradeDate,anaResult);
 
     BigDecimal lastClose = (BigDecimal) df.get(df.length()-1,"close");
     BigDecimal last50Close = (BigDecimal) df.get(df.length() - 50 , "close");
@@ -178,6 +180,25 @@ public class AnaTagServiceImpl implements AnaTagService {
     item.put("rate50",rate50);
     item.put("tradeDate",tradeDate);
     return item;
+  }
+
+  public void saveAnaResult(String tsCode, LocalDateTime tradeDate , Map<String,Object> anaResults) {
+    List<DailyAnaTag> dailyAnaTags = new LinkedList<>();
+    for(Map.Entry<String,Object> entry : anaResults.entrySet()){
+      DailyAnaTag dailyAnaTag = new DailyAnaTag();
+      String key = entry.getKey();
+      Object value = entry.getValue();
+
+      dailyAnaTag.setTradeDate(tradeDate);
+      dailyAnaTag.setTagKey(key);
+      if( BigDecimal.class.isAssignableFrom(value.getClass()) ) {
+        dailyAnaTag.setValue((BigDecimal) value);
+      }else if ( String.class.isAssignableFrom(value.getClass()) ) {
+        dailyAnaTag.setStrValue((String) value);
+      }
+      dailyAnaTags.add(dailyAnaTag);
+    }
+    this.saveBatch(dailyAnaTags);
   }
 
   public Boolean isBigDecimalOver(DataFrame df, int row1,String col1, int row2,String col2){
@@ -194,8 +215,8 @@ public class AnaTagServiceImpl implements AnaTagService {
   }
 
 
-  public DataFrame getDataFrame(String tsCode,Date gteDate, Date lteDate) {
-    Result<List<SplitAdjustedDaily>> result  = splitAdjustedDailyService.getSplitAdjustDailyList(tsCode, gteDate,lteDate);
+  public DataFrame getDataFrame(String tsCode,LocalDateTime gteDate, LocalDateTime lteDate) {
+    Result<List<SplitAdjustedDaily>> result  = splitAdjustedDailyService.getSplitAdjustDailyList(tsCode, LocalDateUtils.asDate(gteDate), LocalDateUtils.asDate(lteDate));
     if(!result.isSuccess()){
       log.error(result.getErrorMsg());
       return null;
@@ -206,7 +227,7 @@ public class AnaTagServiceImpl implements AnaTagService {
 
       String columnName = "Sma"+period;
       List<BigDecimal> closes =  df.col("close");
-      List<BigDecimal> mas = TalibUtil.movingAverage(closes,MAType.Sma,Integer.valueOf(period));
+      List<BigDecimal> mas = TalibUtil.movingAverage(closes, MAType.Sma,Integer.valueOf(period));
       df.add(columnName,mas);
     }
 
@@ -216,7 +237,7 @@ public class AnaTagServiceImpl implements AnaTagService {
 
     for(String period : getVolPeriods()){
       String columnName = "vol"+period;
-      List<Long> vols =  df.col("vol");
+      List<Integer> vols =  df.col("vol");
       List<BigDecimal> bigVols = vols.stream().map(BigDecimal::new).collect(Collectors.toList());
       List<BigDecimal> mas= TalibUtil.movingAverage(bigVols,MAType.Sma,Integer.valueOf(period));
       df.add(columnName,mas);
@@ -272,15 +293,15 @@ public class AnaTagServiceImpl implements AnaTagService {
 
 
   @Override
-  public void anaCompare(Date tradeDate, List<Map> items) {
+  public void anaCompare(LocalDateTime tradeDate, List<Map> items) {
     List<Map> itemsTradeDay = items.stream().filter(item -> {
-      Date itemTradeDate = (Date) item.get("tradeDate");
-      return (DateUtils.formatDate(itemTradeDate, DateUtils.YMD).equals(DateUtils.formatDate(tradeDate, DateUtils.YMD)));
+      LocalDateTime itemTradeDate = (LocalDateTime) item.get("tradeDate");
+      return (LocalDateUtils.formatToStr(itemTradeDate, DateUtils.YMD).equals(LocalDateUtils.formatToStr(tradeDate, DateUtils.YMD)));
     }).collect(Collectors.toList());
     this.anaRS50(tradeDate,itemsTradeDay);
   }
   @Override
-  public void anaRS50(Date tradeDate, List<Map> items){
+  public void anaRS50(LocalDateTime tradeDate, List<Map> items){
     List<Map> sortedRates = items.stream().sorted((l,r)-> {
       BigDecimal left = (BigDecimal) l.get("rate50");
       BigDecimal right = (BigDecimal) r.get("rate50");
@@ -288,13 +309,19 @@ public class AnaTagServiceImpl implements AnaTagService {
     }).collect(Collectors.toList());
 
     int size = sortedRates.size();
+    List<DailyAnaTag> rs50tags = new LinkedList<>();
     for(int i = 0 ; i< sortedRates.size() ; i ++ ){
       Map<String,Object> item = sortedRates.get(i);
       BigDecimal rs = MathUtil.divide(new BigDecimal(i).multiply(new BigDecimal(100)),new BigDecimal(size));
       item.put("RS50",rs);
-      xAnaTagDao.modify((String) item.get("tsCode"),tradeDate, "RS50",rs);
+      DailyAnaTag dailyAnaTag = new DailyAnaTag();
+      dailyAnaTag.setTsCode((String) item.get("tsCode"));
+      dailyAnaTag.setTradeDate(tradeDate);
+      dailyAnaTag.setTagKey("RS50");
+      dailyAnaTag.setValue(rs);
+      rs50tags.add(dailyAnaTag);
     }
+    this.saveBatch(rs50tags);
 
   }
-
 }

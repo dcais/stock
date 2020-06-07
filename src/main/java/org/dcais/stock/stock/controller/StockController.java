@@ -39,9 +39,9 @@ public class StockController {
   @Autowired
   private IDailyBasicService dailyBasicService;
   @Autowired
-  private ConceptDetailService conceptDetailService;
+  private IConceptDetailService conceptDetailService;
   @Autowired
-  private ConceptService conceptService;
+  private IConceptService conceptService;
 
 
   @RequestMapping(value = "/syncBasic", method = RequestMethod.GET)
@@ -63,6 +63,20 @@ public class StockController {
     log.info("info");
     log.debug("debug");
     return Result.wrapSuccessfulResult("");
+  }
+
+  @RequestMapping(value = "/firstSync", method = RequestMethod.GET)
+  @ResponseBody
+  public Result firstSync() {
+    basicService.sync();
+    dailyService.syncAll(CmnConstants.SYNC_MODE_DATE);
+    adjFactorService.syncAll(CmnConstants.SYNC_MODE_DATE);
+    dailyBasicService.syncAll(CmnConstants.SYNC_MODE_DATE);
+    splitAdjustTask.startCalc();
+    anaTagTask.startCalc(null);
+    conceptService.sync();
+    conceptDetailService.sync();
+    return Result.wrapSuccessfulResult("OK");
   }
 
 

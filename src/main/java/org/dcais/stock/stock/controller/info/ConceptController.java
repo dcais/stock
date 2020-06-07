@@ -1,13 +1,14 @@
 package org.dcais.stock.stock.controller.info;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.ConceptDetailService;
-import org.dcais.stock.stock.biz.info.ConceptService;
-import org.dcais.stock.stock.common.cons.CmnConstants;
+import org.dcais.stock.stock.biz.info.IConceptDetailService;
+import org.dcais.stock.stock.biz.info.IConceptService;
 import org.dcais.stock.stock.common.result.Result;
-import org.dcais.stock.stock.common.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RequestMapping("concept")
@@ -15,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ConceptController {
   @Autowired
-  private ConceptService conceptService;
+  private IConceptService conceptService;
   @Autowired
-  private ConceptDetailService conceptDetailService;
+  private IConceptDetailService conceptDetailService;
 
   @RequestMapping(value = "/sync", method = RequestMethod.GET)
   @ResponseBody

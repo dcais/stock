@@ -1,9 +1,7 @@
 package org.dcais.stock.stock.biz;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dcais.stock.stock.biz.info.ConceptService;
-import org.dcais.stock.stock.biz.info.impl.ConceptServiceImpl;
-import org.dcais.stock.stock.biz.info.impl.SplitAdjustServiceImpl;
+import org.dcais.stock.stock.biz.info.IConceptService;
 import org.dcais.stock.stock.entity.info.Concept;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,14 +16,14 @@ import java.util.List;
 @Slf4j
 public class ConceptServiceImplTest extends AbstractTestNGSpringContextTests {
   @Autowired
-  private ConceptServiceImpl conceptServiceImpl;
+  private IConceptService conceptService;
 
   @Test
-  public void test() {conceptServiceImpl.sync();}
+  public void test() {conceptService.sync();}
 
   @Test
   public void getAll(){
-    List<Concept> conceptList =  conceptServiceImpl.getAll();
+    List<Concept> conceptList =  conceptService.getAll();
     for(Concept concept: conceptList){
       log.info(String.format("%s:%s", concept.getCode(), concept.getName()));
     }

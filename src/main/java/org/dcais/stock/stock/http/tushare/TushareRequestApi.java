@@ -1,14 +1,14 @@
 package org.dcais.stock.stock.http.tushare;
 
-import com.yuanpin.common.http.annotation.HttpAttr;
-import com.yuanpin.common.http.annotation.HttpRequest;
-import com.yuanpin.common.http.annotation.ReqBody;
-import com.yuanpin.common.http.enu.HttpMehod;
+import com.github.dcais.aggra.annotation.HttpAttr;
+import com.github.dcais.aggra.annotation.HttpRequest;
+import com.github.dcais.aggra.annotation.ReqBody;
+import com.github.dcais.aggra.enu.HttpMethod;
 import org.dcais.stock.stock.http.tushare.param.TushareParam;
 
 @HttpRequest(url = "${tushare.url}")
 public interface TushareRequestApi {
 
-  @HttpAttr(url = "/", method = HttpMehod.POST)
+  @HttpAttr(url = "/", method = HttpMethod.POST)
   String request(@ReqBody TushareParam tushareParam);
 }
